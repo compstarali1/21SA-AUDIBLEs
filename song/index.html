@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Music Cube - Auto Play</title>
+<style>
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Use your GIF URL here */
+  background: url("https://iili.io/BVfTbLX.gif") no-repeat center center;
+  background-size: cover;
+  opacity: 0.5; /* Set to 0.5 opacity as requested */
+  z-index: -1;   /* Places it behind all other elements */
+}
+
+/* Ensure body background doesn't block the pseudo-element */
+body {
+  background: #000; /* Base color for the transparency to bleed into */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+*, *::before, *::after { box-sizing: border-box; font-family: "Poppins", sans-serif; transform-style: preserve-3d; }
+body { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; overflow: hidden; background: #111; margin: 0; }
+
+/* Initial Overlay to allow Autoplay */
+#overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); z-index: 1000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; cursor: pointer;
+}
+
+.container-3D { position: relative; display: flex; flex-direction: column; align-items: center; width: 280px; height: 480px; perspective: 1200px; }
+.flopper { position: relative; width: 100%; height: 380px; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+
+figure {
+  display: flex; flex-direction: column; position: absolute; width: 100%; height: 100%;
+  padding: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);
+  margin: 0; backface-visibility: hidden; border-radius: 10px; background: #333;
+}
+
+figure div.img-bg { width: 100%; flex: 1; background-size: cover !important; background-position: center !important; border-radius: 6px; }
+figure h2 { font-size: 15pt; margin: 10px 0 2px 0; text-align: center; color: white; }
+figure p { font-size: 9pt; margin: 0 0 10px 0; text-align: center; opacity: 0.7; color: white; }
+
+/* 3D Glass Buttons */
+.glass-btn-container { position: absolute; bottom: 50px; left: 15px; display: flex; gap: 8px; transform: translateZ(10px); }
+.glass-btn {
+  width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3); color: white; transition: 0.3s;
+}
+
+/* Cube Faces */
+.front  { transform: translateZ(140px); }
+.back   { transform: rotateY(180deg) translateZ(140px); }
+.top    { transform: rotateX(90deg) translateZ(140px); }
+.bottom { transform: rotateX(-90deg) translateZ(140px); }
+.left   { transform: rotateY(-90deg) translateZ(140px); }
+.right  { transform: rotateY(90deg) translateZ(140px); }
+
+.nav-bar { position: absolute; bottom: 0; display: flex; gap: 10px; width: 100%; justify-content: space-between; padding: 10px; z-index: 100; }
+.nav-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; background: #222; border: 1px solid #555; color: white; font-size: 18pt; cursor: pointer; border-radius: 8px; box-shadow: 0 4px 0 #000; }
+.nav-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
+</style>
+</head>
+<body>
+
+<div id="overlay" onclick="startApp()">
+    <h1>CLICK TO START</h1>
+    <p>Required to enable audio</p>
+</div>
+
+<div class="container-3D">
+    <div class="flopper" id="cube">
+        <!-- Face 6 -->
+        <figure class="front" data-song="6">
+            <div class="img-bg" style="background: url('https://iili.io/BGEEtm7.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(6)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 6</h2><p>Auto-playing...</p>
+        </figure>
+        <!-- Face 5 -->
+        <figure class="back" data-song="5">
+            <div class="img-bg" style="background: url('https://iili.io/BGEEbI9.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(5)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 5</h2><p>Auto-playing...</p>
+        </figure>
+        <!-- Face 4 -->
+        <figure class="top" data-song="4">
+            <div class="img-bg" style="background: url('https://iili.io/BGEEQ72.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(4)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 4</h2><p>Auto-playing...</p>
+        </figure>
+        <!-- Face 3 -->
+        <figure class="bottom" data-song="3">
+            <div class="img-bg" style="background: url('https://iili.io/BGcIGj9.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(3)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 3</h2><p>Auto-playing...</p>
+        </figure>
+        <!-- Face 2 -->
+        <figure class="left" data-song="2">
+            <div class="img-bg" style="background: url('https://iili.io/BGEEpLu.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(2)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 2</h2><p>Auto-playing...</p>
+        </figure>
+        <!-- Face 1 -->
+        <figure class="right" data-song="1">
+            <div class="img-bg" style="background: url('https://iili.io/BGEGJrx.png')"></div>
+            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(1)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
+            <h2>Song 1</h2><p>Auto-playing...</p>
+        </figure>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-btn" onclick="rotate('left')">←</div>
+        <div class="nav-btn" onclick="rotate('down')">↓</div>
+        <div class="nav-btn" onclick="rotate('up')">↑</div>
+        <div class="nav-btn" onclick="rotate('right')">→</div>
+    </div>
+</div>
+
+<script>
+    let rotateY = 0;
+    let rotateX = 0;
+    let currentAudio = new Audio();
+    let isStarted = false;
+    const cube = document.getElementById('cube');
+
+    // Mappings of Rotation -> Face shown
+    function getVisibleSong() {
+        // Simple logic to find face based on 90deg increments
+        let normX = ((rotateX % 360) + 360) % 360;
+        let normY = ((rotateY % 360) + 360) % 360;
+
+        if (normX === 90 || normX === 270) {
+            return normX === 90 ? 3 : 4; // Bottom / Top
+        }
+        if (normY === 0) return 6;    // Front
+        if (normY === 90) return 2;   // Left (rotated 90)
+        if (normY === 180) return 5;  // Back
+        if (normY === 270) return 1;  // Right
+        return 6;
+    }
+
+    function startApp() {
+        document.getElementById('overlay').style.display = 'none';
+        isStarted = true;
+        autoPlayCurrentFace();
+    }
+
+    function rotate(direction) {
+        if (direction === 'left') rotateY -= 90;
+        if (direction === 'right') rotateY += 90;
+        if (direction === 'up') rotateX += 90;
+        if (direction === 'down') rotateX -= 90;
+
+        cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        
+        if(isStarted) {
+            // Wait for rotation to finish, then play
+            setTimeout(autoPlayCurrentFace, 800);
+        }
+    }
+
+    function autoPlayCurrentFace() {
+        const songToPlay = getVisibleSong();
+        playAudio(songToPlay);
+    }
+
+    function manualPlay(num) {
+        if(!isStarted) return;
+        playAudio(num);
+    }
+
+    function playAudio(num) {
+        const file = num + ".mp3";
+        console.log("Playing: " + file);
+        currentAudio.pause();
+        currentAudio.src = file;
+        currentAudio.play().catch(e => console.log("Audio file missing: " + file));
+    }
+
+    function stopAudio() {
+        currentAudio.pause();
+    }
+</script>
+
+</body>
+</html>
