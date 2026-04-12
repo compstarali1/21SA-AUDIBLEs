@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrystalShare Unit</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #050608;
+            --accent: #00f2ff;
+            --glass: rgba(255, 255, 255, 0.08);
+            --success: #00ff88;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; margin: 0; overflow: hidden; position: relative;
+        }
+
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=2070') center/cover;
+            opacity: 0.3; z-index: -1; filter: blur(5px); animation: bgMove 20s infinite alternate;
+        }
+        @keyframes bgMove { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+        /* Floating GIF - No container, no shifting */
+.ali-gif {
+    position: absolute;
+    top: 1%;
+    width: 30%;
+    height: auto;
+    z-index: 100;
+    pointer-events: none;
+    
+    /* ADD THESE LINES */
+    background: transparent !important;
+    mix-blend-mode: screen; /* This hides black and keeps the white/light lines */
+}
+
+
+        
+        /* Panel & Buttons */
+        .info-panel { background: var(--glass); backdrop-filter: blur(15px); border-radius: 20px; padding: 15px; width: 300px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); text-align: center;}
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .crystal-btn {
+            width: 140px; height: 110px; background: var(--glass); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px; backdrop-filter: blur(20px); cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.3s; box-shadow: 8px 8px 15px rgba(0,0,0,0.5); position: relative;
+        }
+
+        .crystal-btn:active { transform: scale(0.92); box-shadow: inset 5px 5px 15px rgba(0,0,0,0.8); }
+        .indicator { width: 6px; height: 6px; border-radius: 50%; background: #333; margin-top: 8px; }
+        .active-ind { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .pulse { animation: crystal-pulse 1.5s infinite; border-color: var(--success); }
+        @keyframes crystal-pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(0, 255, 136, 0); } }
+
+        /* Modal & Nav */
+        #mediaModal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 95%; max-width: 600px; background: rgba(5, 6, 8, 0.98);
+            border-radius: 30px; border: 1px solid var(--accent); padding: 20px; z-index: 1000;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #file-overlay { font-size: 0.8rem; color: var(--accent); font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; }
+        
+        video, img { width: 100%; border-radius: 15px; max-height: 300px; object-fit: contain; background: #000; }
+
+        .nav-controls { display: flex; justify-content: space-between; margin-top: 15px; gap: 10px; }
+        .nav-btn { flex: 1; padding: 12px; font-size: 0.7rem; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+<h1><marquee>Custom private Media file tranfer - Copy number ID below and send it to matching user</marquee></h1>
+    <!-- Transparent GIF on top (Directly in body, absolute position) -->
+    <img src="ali.gif" class="ali-gif" alt="Animation">
+
+    <div class="info-panel">
+        <strong style="font-size: 0.7rem; opacity: 0.6;">CRYSTAL UNIT ID</strong>
+        <div id="my-id-display" style="color: var(--accent); font-weight: bold; margin: 10px 0;">INITIALIZING...</div>
+        <button onclick="copyMyID()" class="crystal-btn" style="width: 100%; height: 40px; font-size: 0.8rem;">COPY ID</button>
+        <div id="buffer-list" style="font-size: 0.6rem; margin-top: 10px; color: #888;">No files in vault.</div>
+    </div>
+
+    <div class="btn-grid">
+        <label for="fileInput" class="crystal-btn"><span>LOAD</span><div id="load-ind" class="indicator"></div></label>
+        <input type="file" id="fileInput" multiple hidden>
+
+        <div class="crystal-btn" onclick="connectToFriend()"><span>CONNECT</span><div id="conn-ind" class="indicator"></div></div>
+        <div class="crystal-btn" onclick="sendBulk()"><span>SEND ALL</span><div id="send-ind" class="indicator"></div></div>
+        <div class="crystal-btn" id="view-btn" onclick="toggleModal()"><span>VIEW</span><div id="view-ind" class="indicator"></div></div>
+    </div>
+
+    <!-- Media Modal -->
+    <div id="mediaModal">
+        <div class="modal-header">
+            <span id="file-overlay">FILE_NAME</span>
+            <button onclick="shareFile()" style="background:var(--accent); border:none; border-radius:10px; padding:8px 15px; font-weight:bold; cursor:pointer;">SHARE/SAVE</button>
+        </div>
+        
+        <div id="media-content">
+            <video id="vPlayer" controls style="display:none;"></video>
+            <img id="iPlayer" style="display:none;">
+        </div>
+
+        <div class="nav-controls">
+            <button class="crystal-btn nav-btn" onclick="changeFile(-1)">PREV</button>
+            <button class="crystal-btn nav-btn" onclick="changeFile(1)">NEXT</button>
+        </div>
+        
+        <button onclick="toggleModal()" style="width:100%; background:none; color:white; border:1px solid #444; margin-top:15px; padding:10px; border-radius:10px;">CLOSE</button>
+    </div>
+
+    <script>
+        const peer = new Peer();
+        let conn;
+        let localQueue = [];
+        let receivedFiles = [];
+        let currentIndex = 0;
+
+        function haptic(t) { if(navigator.vibrate) navigator.vibrate(t === 'hi' ? [80, 40, 80] : 20); }
+
+        peer.on('open', (id) => { 
+            document.getElementById('my-id-display').innerText = id; 
+        });
+
+        function copyMyID() {
+            const id = document.getElementById('my-id-display').innerText;
+            const el = document.createElement('textarea');
+            el.value = id;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            haptic('hi');
+            alert("ID Copied: " + id);
+        }
+
+        peer.on('connection', (c) => { conn = c; initConn(); });
+
+        function connectToFriend() {
+            const fId = prompt("Enter Friend's ID:");
+            if (fId) { conn = peer.connect(fId); initConn(); }
+        }
+
+        function initConn() {
+            conn.on('open', () => {
+                document.getElementById('conn-ind').classList.add('active-ind');
+                haptic('hi');
+            });
+
+            conn.on('data', (data) => {
+                const blob = new Blob([data.file], { type: data.type });
+                receivedFiles.push({ blob, name: data.name, type: data.type });
+                currentIndex = receivedFiles.length - 1;
+                
+                document.getElementById('view-ind').classList.add('active-ind');
+                document.getElementById('view-btn').classList.add('pulse');
+                document.getElementById('buffer-list').innerHTML = `Vault: ${receivedFiles.length} files received.`;
+                haptic('hi');
+            });
+        }
+
+        document.getElementById('fileInput').onchange = (e) => {
+            localQueue = Array.from(e.target.files);
+            document.getElementById('load-ind').classList.add('active-ind');
+            document.getElementById('buffer-list').innerHTML = `${localQueue.length} files ready to send.`;
+        };
+
+        function sendBulk() {
+            if (!conn || localQueue.length === 0) return alert("Connect & Load files!");
+            localQueue.forEach(f => conn.send({ file: f, name: f.name, type: f.type }));
+            document.getElementById('send-ind').classList.add('active-ind');
+        }
+
+        function toggleModal() {
+            const m = document.getElementById('mediaModal');
+            if(m.style.display === 'block') {
+                m.style.display = 'none';
+                document.getElementById('vPlayer').pause();
+            } else {
+                if(receivedFiles.length === 0) return alert("No files in vault.");
+                m.style.display = 'block';
+                document.getElementById('view-btn').classList.remove('pulse');
+                renderCurrentFile();
+            }
+        }
+
+        function renderCurrentFile() {
+            const file = receivedFiles[currentIndex];
+            const url = URL.createObjectURL(file.blob);
+            document.getElementById('file-overlay').innerText = `[${currentIndex+1}/${receivedFiles.length}] ${file.name}`;
+            
+            const v = document.getElementById('vPlayer');
+            const i = document.getElementById('iPlayer');
+            
+            if(file.type.includes('video')) {
+                v.src = url; v.style.display = 'block'; i.style.display = 'none';
+            } else {
+                i.src = url; i.style.display = 'block'; v.style.display = 'none';
+            }
+        }
+
+        function changeFile(dir) {
+            haptic();
+            currentIndex += dir;
+            if(currentIndex < 0) currentIndex = receivedFiles.length - 1;
+            if(currentIndex >= receivedFiles.length) currentIndex = 0;
+            renderCurrentFile();
+        }
+
+        async function shareFile() {
+            const fileData = receivedFiles[currentIndex];
+            const file = new File([fileData.blob], fileData.name, { type: fileData.type });
+            if (navigator.share) {
+                await navigator.share({ files: [file], title: fileData.name });
+            } else {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(fileData.blob);
+                a.download = fileData.name;
+                a.click();
+            }
+        }
+    </script>
+</body>
+</html>
