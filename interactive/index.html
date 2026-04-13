@@ -1,294 +1,261 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Van’s Warm Embrace</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Visions</title>
+    <style>
+        /* CORE RESET */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;1,400;1,700&display=swap" rel="stylesheet">
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #00000080; /* Fallback */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body,html{width:100%;height:100%;font-family:'Playfair Display',serif;color:#fff;}
+        /* GUARANTEED GIF BACKGROUND */
+        .gif-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            /* Using ./ ensures it looks in the local folder on GitHub */
+            background: url('./bg.gif') no-repeat center center;
+            background-size: cover;
+        }
 
-.fixed-bg-container{
-position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-10;
-}
-.fixed-bg-container img{width:100%;height:100%;object-fit:cover;}
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: rgba(0, 0, 0, 0.4); 
+        }
 
-.glass-overlay{
-position:fixed;top:0;left:0;width:100%;height:100%;
-background:rgba(0,0,0,0.7);z-index:-5;
-}
+        /* MAIN UI */
+        #main-container {
+            text-align: center;
+            z-index: 10;
+            transition: all 0.6s ease;
+        }
 
-.scroll-content{position:relative;z-index:10;width:100%;padding:0 10px;}
+        h1 {
+            color: white;
+            font-size: 3rem;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+            text-shadow: 0 0 20px #ff2d55;
+            animation: floating 4s ease-in-out infinite;
+        }
 
-/* BUTTON BAR */
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
 
-.button-bar{
-width:100%;
-max-width:1200px;
-margin:20px auto 10px auto;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-gap:10px;
-padding:0 5px;
-}
+        /* 3D FROSTED BUTTONS */
+        .btn-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
 
-.control-btn{
-padding:10px 12px;
-border-radius:14px;
-border:1px solid rgba(255,255,255,0.25);
-background:linear-gradient(135deg,#ff4fa3,#000000,#2979ff);
-background-size:200% 200%;
-animation:gradientMove 6s ease infinite;
-backdrop-filter:blur(10px);
--webkit-backdrop-filter:blur(10px);
-color:#fff;
-font-weight:600;
-cursor:pointer;
-box-shadow:0 8px 20px rgba(0,0,0,0.6);
-transition:transform .2s;
-}
+        .glass-btn {
+            width: 340px;
+            padding: 22px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            transform: perspective(600px) rotateX(15deg);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-.control-btn:hover{transform:scale(1.05);}
+        .glass-btn:hover {
+            transform: perspective(600px) rotateX(0deg) translateY(-10px) scale(1.05);
+            border-color: #ff2d55;
+            box-shadow: 0 0 40px rgba(255, 45, 85, 0.5);
+            background: rgba(255, 45, 85, 0.1);
+        }
 
-@keyframes gradientMove{
-0%{background-position:0% 50%;}
-50%{background-position:100% 50%;}
-100%{background-position:0% 50%;}
-}
+        /* VIDEO MODAL (90% WIDTH) */
+        #video-view {
+            display: none;
+            position: absolute;
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 20px;
+            z-index: 100;
+            flex-direction: column;
+            box-shadow: 0 50px 150px rgba(0,0,0,1);
+            opacity: 0;
+            transform: scale(0.8) perspective(1000px) rotateX(5deg);
+            transition: 0.6s ease;
+        }
 
-/* HERO */
+        #video-view.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1) perspective(1000px) rotateX(0deg);
+        }
 
-h1{
-font-family:'Great Vibes',cursive;
-font-size:clamp(2.5rem,8vw,4.5rem);
-color:#c5a059;
-text-align:center;
-margin-bottom:30px;
-}
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
 
-.top-hero-section{
-padding-top:6vh;
-padding-bottom:40px;
-display:flex;
-flex-direction:column;
-align-items:center;
-}
+        .close { font-size: 55px; color: white; cursor: pointer; line-height: 0.5; }
+        .close:hover { color: #ff2d55; transform: scale(1.1); }
 
-.portrait-frame{
-width:100%;
-max-width:500px;
-border:1px solid rgba(197,160,89,0.5);
-box-shadow:0 20px 50px rgba(0,0,0,0.7);
-animation:float3d 6s ease-in-out infinite;
-}
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            background: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
 
-.portrait-frame img{width:100%;}
+        /* PROGRESS BAR / SEEKER */
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-@keyframes float3d{
-0%,100%{transform:translateY(0) rotateX(2deg);}
-50%{transform:translateY(-15px) rotateX(5deg);}
-}
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: #ff2d55;
+            height: 8px;
+            border-radius: 5px;
+        }
 
-.story-text-container{
-padding:40px 0;
-font-size:1.4rem;
-line-height:2.2;
-text-align:justify;
-}
-
-.drop-cap{
-font-family:'Great Vibes',cursive;
-font-size:6rem;
-float:left;
-margin-right:15px;
-line-height:0.7;
-color:#c5a059;
-}
-
-#audioPlayer{
-width:100%;
-max-width:400px;
-margin:20px auto;
-display:none;
-}
-
-.petal{
-position:fixed;
-top:-50px;
-z-index:100;
-font-size:20px;
-animation:fall linear infinite;
-}
-
-@keyframes fall{
-to{transform:translateY(110vh) rotate(360deg);}
-}
-
-footer{
-padding:80px 0;
-text-align:center;
-font-family:'Great Vibes',cursive;
-font-size:3rem;
-color:#c5a059;
-}
-</style>
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            color: #efefef;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="fixed-bg-container">
-<img src="images/background_picnic.jpg">
-</div>
+    <!-- This div carries your gif -->
+    <div class="gif-background"></div>
+    <div class="overlay"></div>
 
-<div class="glass-overlay"></div>
+    <div id="main-container">
+        <h1>My Visions</h1>
+        <div class="btn-stack">
+            <button class="glass-btn" onclick="playVid('vid1.mp4')">Part One</button>
+            <button class="glass-btn" onclick="playVid('vid2.mp4')">Part Two</button>
+            <button class="glass-btn" onclick="playVid('vid3.mp4')">Final Act</button>
+        </div>
+    </div>
 
-<div class="scroll-content">
+    <!-- VIDEO MODAL -->
+    <div id="video-view">
+        <div class="header">
+            <span class="close" onclick="stopVid()">&times;</span>
+        </div>
+        
+        <video id="mainPlayer" playsinline>
+            <source id="vidSource" src="" type="video/mp4">
+        </video>
 
-<div class="button-bar">
+        <div class="controls">
+            <input type="range" id="seeker" value="0" step="0.1">
+            <div class="time-info">
+                <span id="currentTime">00:00</span>
+                <span id="durationTime">00:00</span>
+            </div>
+        </div>
+    </div>
 
-<button class="control-btn" onclick="playAudio()">Play MP3</button>
-<button class="control-btn" onclick="window.location.href='Soaking.html'">Next Soaking Story</button>
-<button class="control-btn" onclick="window.location.href='Dripping.html'">Next Dripping Story</button>
-<button class="control-btn" onclick="readTTS()">TTS Read</button>
-<button class="control-btn" id="stopBtn" onclick="stopAll()" style="display:none;">Stop</button>
+    <script>
+        const view = document.getElementById('video-view');
+        const main = document.getElementById('main-container');
+        const player = document.getElementById('mainPlayer');
+        const source = document.getElementById('vidSource');
+        const seeker = document.getElementById('seeker');
+        const curTime = document.getElementById('currentTime');
+        const durTime = document.getElementById('durationTime');
 
-</div>
+        function playVid(file) {
+            source.src = file;
+            player.load();
+            
+            main.style.opacity = "0";
+            setTimeout(() => {
+                main.style.display = "none";
+                view.style.display = "flex";
+                setTimeout(() => {
+                    view.classList.add('active');
+                    player.play();
+                }, 50);
+            }, 500);
+        }
 
-<section class="top-hero-section">
+        function stopVid() {
+            player.pause();
+            view.classList.remove('active');
+            setTimeout(() => {
+                view.style.display = "none";
+                main.style.display = "block";
+                setTimeout(() => main.style.opacity = "1", 50);
+            }, 600);
+        }
 
-<h1>The Van’s Warm Embrace</h1>
+        // Seeker Update logic
+        player.onloadedmetadata = function() {
+            seeker.max = player.duration;
+            durTime.innerText = formatTime(player.duration);
+        };
 
-<div class="portrait-frame">
-<img src="images/heidi_portrait.jpg">
-</div>
+        player.ontimeupdate = function() {
+            if (!seeker.matches(':active')) {
+                seeker.value = player.currentTime;
+            }
+            curTime.innerText = formatTime(player.currentTime);
+        };
 
-</section>
+        seeker.oninput = function() {
+            player.currentTime = seeker.value;
+        };
 
-<audio id="audioPlayer" controls>
-<source src="story.mp3" type="audio/mpeg">
-</audio>
-
-<article class="story-text-container">
-
-<p><span class="drop-cap">H</span>eidi slips into Ali’s van after work, drawn by his text and the promise of escape. The heat of the van wraps around her like a lover’s embrace, the scent of leather and bergamot mingling with the metallic tang of his tools. When his hands find her, rough and possessive, she’s torn between the thrill of danger and the heat building inside her.</p>
-
-<p>The workplace lights flickered overhead like dying fireflies, casting long shadows across the empty desks as I slipped my phone back into my purse. Ali’s text had come through just as I was locking my drawer—big eyes emoji, pretty please—no words needed. My fingers tightened around the smooth leather strap of my bag, the weight of the day’s frustration still clinging to my shoulders like a second skin. The hum of the fluorescent bulbs buzzed in my ears, too bright, too sterile, as I made my way toward the back exit, heels clicking sharply against the polished floor.</p>
-
-<p>The back street smelled of damp pavement and diesel fumes, the air thick with the kind of chill that seeped through wool coats. My breath curled in front of me as I scanned the line of parked vans, their dark windows reflecting the sickly orange glow of the streetlamps. Then I saw it—Ali’s sleek black cargo van, humming quietly, a thin wisp of steam rising from the exhaust pipe. The side door was cracked open just enough to spill a warm, golden rectangle of light onto the asphalt. My pulse kicked up, not from the cold, but from the promise of what waited inside.</p>
-
-<p>I ducked in, the heat wrapping around me like a lover’s arms, rich and sudden. The van smelled of leather and something citrusy—bergamot, maybe—mixed with the faint metallic tang of Ali’s tools. The space was immaculate, the floor covered in a thick, plush blanket that muffled my steps as I kicked off my heels. His office chair sat at the far end, angled toward a small monitor mounted on the wall, the CCTV feed flickering with static. Tools and spare parts were neatly pushed into the corner, their silhouettes sharp against the dim lighting. And there, on the folded-down bench seat, was a plastic cup of wine, the deep red liquid catching the light like a promise.</p>
-
-<p>“Took you long enough,” Ali murmured, not turning around. His voice was rough, the kind of rough that made my thighs press together. He was still in his suit jacket, the tie loosened just enough to show the crisp white of his shirt beneath. His broad shoulders shifted as he reached for something on the dashboard, the muscles beneath the fabric flexing in a way that had my breath hitching.</p>
-
-<p>I swallowed, my fingers brushing the stem of the wineglass as I sat. “Had to make sure no one saw me sneaking out like a teenager.” The wine was good—dry, with a bite that lingered on my tongue. I took another sip, letting the warmth of it spread through me, loosening the knots in my chest. The van’s engine purred softly, the vibrations humming up through the blanket, through my stockings.</p>
-
-<p>Then his hand was on my knee.</p>
-
-<p>I jumped, wine sloshing over the rim of the cup, but before I could react, his fingers were already sliding upward, bunching the fabric of my skirt. His touch was sure, possessive, like he’d been thinking about this all day.</p>
-
-<p>“Ali—” My voice came out breathier than I meant it to.</p>
-
-<p>“Shh.” His other hand found my wrist, guiding the wineglass to the bench beside me before his fingers curled around the back of my neck, pulling me forward. His mouth crashed into mine, hot and demanding. I moaned into him, my free hand gripping his shoulder as he kissed me deeper.</p>
-
-<p>The van’s windows were dark, but the CCTV monitor flickered in the corner, the grainy feed showing the empty alley outside. Anyone could walk by. Anyone could see.</p>
-
-<p>And somehow that thought alone made my pulse race even faster.</p>
-
-</article>
-
-<footer>Forever Yours, Ali</footer>
-
-</div>
-
-<script>
-
-let currentAudio=null;
-
-/* petals */
-
-function spawnPetal(){
-
-const p=document.createElement('div');
-p.classList.add('petal');
-
-p.innerHTML=['🌸','✨','🌹'][Math.floor(Math.random()*3)];
-
-p.style.left=Math.random()*100+'vw';
-p.style.animationDuration=Math.random()*3+4+'s';
-p.style.opacity=Math.random();
-
-document.body.appendChild(p);
-
-setTimeout(()=>p.remove(),7000);
-}
-
-setInterval(spawnPetal,800);
-
-/* MP3 */
-
-function playAudio(){
-
-const audio=document.getElementById("audioPlayer");
-audio.style.display="block";
-
-audio.play();
-currentAudio=audio;
-
-document.getElementById("stopBtn").style.display="block";
-}
-
-/* TTS */
-
-async function readTTS(){
-
-const storyText=document.getElementById("story").innerText;
-
-const response=await fetch(
-"https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_GOOGLE_API_KEY",
-{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-input:{text:storyText},
-voice:{languageCode:"en-GB",name:"en-GB-Neural2-F"},
-audioConfig:{audioEncoding:"MP3"}
-})
-});
-
-const data=await response.json();
-
-const audioBase64=data.audioContent;
-const audioSrc="data:audio/mp3;base64,"+audioBase64;
-
-const audio=document.getElementById("audioPlayer");
-
-audio.src=audioSrc;
-audio.style.display="block";
-audio.play();
-
-currentAudio=audio;
-
-document.getElementById("stopBtn").style.display="block";
-}
-
-/* STOP */
-
-function stopAll(){
-
-if(currentAudio){
-currentAudio.pause();
-currentAudio.currentTime=0;
-}
-
-document.getElementById("stopBtn").style.display="none";
-
-}
-
-</script>
-
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            let m = Math.floor(seconds / 60);
+            let s = Math.floor(seconds % 60);
+            return (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
+        }
+    </script>
 </body>
 </html>
