@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Portal</title>
     <style>
         :root {
-            --frost: rgba(255, 255, 255, 0.2);
-            --border: rgba(255, 255, 255, 0.8);
+            --frost: rgba(255, 255, 255, 0.15);
+            --border: rgba(255, 255, 255, 0.6);
             --accent: #00f2ff;
-            --sidebar-width: 154px;
+            --sidebar-width: 180px; /* Slightly wider for better image visibility */
             --top-bar-height: 50px;
         }
 
@@ -25,126 +26,109 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('bg.gif') no-repeat center center fixed;
             background-size: cover;
-            opacity: 0.2;
+            opacity: 0.3;
             z-index: -1;
         }
 
-        #main-viewport {
-            position: fixed; 
-            top: var(--top-bar-height);
-            left: 0; width: 90%; 
-            height: calc(90% - var(--top-bar-height)); 
-            border: none; z-index: 1;
-            background: transparent;
-            display: none;
-        }
-
-        #reset-btn {
-            position: fixed; top: 10px; left: 60px;
-            z-index: 100; padding: 10px 15px;
-            background: red; color: white; border: none;
-            border-radius: 5px; cursor: pointer; font-weight: bold;
-            display: none; box-shadow: 0 0 10px rgba(0,0,0,0.7);
-        }
-
-        .video-bar {
-            position: fixed; top: 0; right: 0;
-            display: flex; z-index: 100;
-            height: var(--top-bar-height);
-        }
-
-        .vid-btn {
-            width: 90px; height: var(--top-bar-height);
-            background: var(--frost);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            color: white; font-weight: bold; cursor: pointer;
-            border-top: none; transition: 0.3s;
-        }
-        .vid-btn:hover { background: var(--accent); color: black; }
-
-        /* Updated Tongue: 10% narrower (36px), Black color */
-        #menu-tongue {
-            position: fixed; left: 0; top: 50%;
-            transform: translateY(-50%);
-            width: 36px; /* 10% smaller than 40px */
-            height: 80px;
-            background: #000000; /* Black background */
-            border: 1px solid var(--accent); /* Thin cyan border for contrast */
-            border-left: none;
-            border-radius: 0 50px 50px 0;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1001;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.8);
-        }
-        
-        /* High contrast Cyan text on Black background */
-        #menu-tongue span { 
-            writing-mode: vertical-rl; 
-            font-weight: bold; 
-            color: var(--accent); 
-            font-size: 11px; 
-            text-shadow: 0 0 5px rgba(0, 242, 255, 0.5);
-        }
-
+        /* SIDEBAR STYLES */
         #sidebar {
             position: fixed; left: calc(-1 * var(--sidebar-width));
             top: 0; height: 100%; width: var(--sidebar-width);
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('bg.jpg');
-            background-size: cover;
-            border-right: 5px solid var(--accent);
+            background: rgba(10, 10, 15, 0.9);
+            backdrop-filter: blur(15px);
+            border-right: 3px solid var(--accent);
             display: flex; flex-direction: column;
-            justify-content: space-evenly;
-            align-items: center;
-            padding: 10px 0;
+            padding: 10px 5px;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 1002;
+            gap: 3px; /* 3px spacing between buttons */
         }
         #sidebar.open { transform: translateX(var(--sidebar-width)); }
 
-        .btn-frost {
-            width: 85%; padding: 12px 5px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(20px);
-            border: 2px solid var(--border);
-            border-radius: 10px; color: white;
-            font-weight: 900; cursor: pointer;
-            text-shadow: 2px 2px 4px black;
+        /* MERGED BUTTONS CONTAINER */
+        .merged-group {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Takes up most space */
+            gap: 3px;
+        }
+
+        /* IMAGE BUTTON STYLING */
+        .img-btn {
+            position: relative;
+            width: 100%;
+            flex-grow: 1; /* Distributes height equally among the 6 */
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
             transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .btn-frost:hover { border-color: var(--accent); transform: scale(1.05); }
 
-        .red-glow {
-            background: radial-gradient(circle, rgba(255,0,0,0.4), rgba(70,0,0,0.8));
+        /* Mini Widescreen Ratio Logic: Ensure they feel like video thumbnails */
+        .img-btn:hover { border-color: var(--accent); transform: scale(0.98); }
+
+        /* LABEL OVERLAY */
+        .btn-label {
+            width: 90%;
+            padding: 5px 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            text-shadow: 0 0 5px var(--accent);
+            pointer-events: none; /* Let clicks pass to button */
+        }
+
+        /* SEPARATE LOCKED BUTTON */
+        .locked-btn {
+            margin-top: 15px;
+            height: 70px; /* Specific fixed height for the 7th button */
+            background-image: url('X.png');
+            background-color: #400; /* Dark red tint */
+            border: 2px solid #ff4d4d;
+        }
+        .locked-btn .btn-label {
             border-color: #ff4d4d;
-        }
-        .red-glow:hover {
-            box-shadow: 0 0 15px #ff0000;
-            border-color: white;
+            color: #ff4d4d;
+            text-shadow: 0 0 8px #ff0000;
         }
 
-        #video-modal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.9);
-            z-index: 2000; justify-content: center; align-items: center;
+        /* --- TONGUE & VIDEO STYLES (Keep existing) --- */
+        #menu-tongue {
+            position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+            width: 36px; height: 80px; background: #000; border: 1px solid var(--accent);
+            border-left: none; border-radius: 0 50px 50px 0;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 1001;
         }
+        #menu-tongue span { writing-mode: vertical-rl; font-weight: bold; color: var(--accent); font-size: 11px; }
+
+        .video-bar { position: fixed; top: 0; right: 0; display: flex; z-index: 100; height: var(--top-bar-height); }
+        .vid-btn { width: 90px; height: var(--top-bar-height); background: var(--frost); backdrop-filter: blur(10px); border: 1px solid var(--border); color: white; cursor: pointer; }
+        
+        #video-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
         .video-container { width: 90%; position: relative; }
         .video-container video { width: 100%; height: auto; border: 2px solid var(--accent); }
-        .close-vid {
-            position: absolute; top: -50px; right: 0;
-            color: white; font-size: 40px; cursor: pointer; font-weight: bold;
-        }
     </style>
 </head>
 <body onclick="instantClose(event)">
 
-    <button id="reset-btn" onclick="resetPage()">CLOSE PAGE [X]</button>
-    <iframe id="main-viewport" src=""></iframe>
-
     <div class="video-bar">
-        <button class="vid-btn" onclick="openVideo('vid1.mp4')">AC Trailer</button>
-        <button class="vid-btn" onclick="openVideo('vid2.mp4')">new-Book-trailer</button>
-        <button class="vid-btn" onclick="openVideo('vid3.mp4')">Missing-You</button>
+        <button class="vid-btn" onclick="openVideo('vid1.mp4')">VID 1</button>
+        <button class="vid-btn" onclick="openVideo('vid2.mp4')">VID 2</button>
+        <button class="vid-btn" onclick="openVideo('vid3.mp4')">VID 3</button>
     </div>
 
     <div id="menu-tongue" onmouseover="openSidebar()">
@@ -152,23 +136,45 @@
     </div>
 
     <div id="sidebar" onmouseleave="startTimer()" onmouseenter="clearTimer()">
-        <button class="btn-frost" onclick="loadPage('share/index.html')">Share Media</button>
-        <button class="btn-frost" onclick="loadPage('song/index.html')">Song-Cube</button>
-        <button class="btn-frost" onclick="loadPage('willy/index.html')">Wet-willy</button>
-        <button class="btn-frost" onclick="loadPage('professor/index.html')">Professor</button>
-        <button class="btn-frost" onclick="loadPage('missingyou/index.html')">Missing-You</button>
-        <button class="btn-frost" onclick="loadPage('new/index.html')">New Recruit</button>
-        <button class="btn-frost red-glow" onclick="openLocked()">[ X ] LOCKED</button>
+        <!-- Merged 6 Buttons -->
+        <div class="merged-group">
+            <div class="img-btn" style="background-image: url('1.png');" onclick="loadPage('share/index.html')">
+                <div class="btn-label">Share Media</div>
+            </div>
+            <div class="img-btn" style="background-image: url('2.png');" onclick="loadPage('song/index.html')">
+                <div class="btn-label">Song-Cube</div>
+            </div>
+            <div class="img-btn" style="background-image: url('3.png');" onclick="loadPage('willy/index.html')">
+                <div class="btn-label">Wet-willy</div>
+            </div>
+            <div class="img-btn" style="background-image: url('4.png');" onclick="loadPage('professor/index.html')">
+                <div class="btn-label">Professor</div>
+            </div>
+            <div class="img-btn" style="background-image: url('5.png');" onclick="loadPage('missingyou/index.html')">
+                <div class="btn-label">Missing-You</div>
+            </div>
+            <div class="img-btn" style="background-image: url('6.png');" onclick="loadPage('new/index.html')">
+                <div class="btn-label">New Recruit</div>
+            </div>
+        </div>
+
+        <!-- Separate 7th Button -->
+        <div class="img-btn locked-btn" onclick="openLocked()">
+            <div class="btn-label">[ X ] LOCKED</div>
+        </div>
     </div>
 
     <div id="video-modal">
         <div class="video-container">
-            <span class="close-vid" onclick="closeVideo()">×</span>
+            <span style="position:absolute; top:-50px; right:0; color:white; font-size:40px; cursor:pointer;" onclick="closeVideo()">×</span>
             <video id="vid-player" controls>
                 <source id="vid-src" src="" type="video/mp4">
             </video>
         </div>
     </div>
+
+    <iframe id="main-viewport" style="display:none; position:fixed; top:50px; left:0; width:100%; height:calc(100% - 50px); border:none; z-index:1;"></iframe>
+    <button id="reset-btn" style="display:none; position:fixed; top:10px; left:10px; z-index:2001; background:red; color:white; border:none; padding:10px; border-radius:5px;" onclick="resetPage()">CLOSE [X]</button>
 
     <script>
         const sidebar = document.getElementById('sidebar');
@@ -178,15 +184,9 @@
 
         function openSidebar() { sidebar.classList.add('open'); clearTimer(); }
         function closeSidebar() { sidebar.classList.remove('open'); }
-        
-        function instantClose(e) {
-            if (!sidebar.contains(e.target) && !document.getElementById('menu-tongue').contains(e.target)) {
-                closeSidebar();
-            }
-        }
-
         function startTimer() { hideTimer = setTimeout(closeSidebar, 3000); }
         function clearTimer() { clearTimeout(hideTimer); }
+        function instantClose(e) { if (!sidebar.contains(e.target) && !document.getElementById('menu-tongue').contains(e.target)) closeSidebar(); }
 
         function loadPage(url) {
             viewport.src = url;
@@ -202,11 +202,10 @@
         }
 
         function openVideo(src) {
-            const modal = document.getElementById('video-modal');
-            const player = document.getElementById('vid-player');
             document.getElementById('vid-src').src = src;
+            const player = document.getElementById('vid-player');
             player.load();
-            modal.style.display = 'flex';
+            document.getElementById('video-modal').style.display = 'flex';
             player.play();
         }
 
