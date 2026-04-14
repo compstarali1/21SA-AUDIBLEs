@@ -24,9 +24,9 @@
         body::before {
             content: "";
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('bg.gif') no-repeat center center fixed;
+            background: url('bg2.gif') no-repeat center center fixed;
             background-size: cover;
-            opacity: 0.2;
+            opacity: 0.4;
             z-index: -1;
         }
 
@@ -115,9 +115,9 @@
 <body onclick="instantClose(event)">
 
     <div class="video-bar">
-        <button class="vid-btn" onclick="openVideo('vid1.mp4')">Love-Story</button>
-        <button class="vid-btn" onclick="openVideo('vid2.mp4')">Trailers</button>
-        <button class="vid-btn" onclick="openVideo('vid3.mp4')">For Ebooks</button>
+        <button class="vid-btn" onclick="openVideo('vid1.mp4')">trailer1 Book</button>
+        <button class="vid-btn" onclick="openVideo('vid2.mp4')">trailer2</button>
+        <button class="vid-btn" onclick="openVideo('vid3.mp4')">Missing-You Ebooks</button>
     </div>
 
     <div id="menu-tongue" onmouseover="openSidebar()">
@@ -126,11 +126,11 @@
 
     <div id="sidebar" onmouseleave="startTimer()" onmouseenter="clearTimer()">
         <div class="merged-group">
-            <div class="img-btn" style="background-image: url('1.png');" onclick="loadPage('share/index.html')">
-                <div class="btn-label">Share</div>
+            <div class="img-btn" style="background-image: url('a.png');" onclick="loadPage('share/index.html')">
+                <div class="btn-label">Share Media</div>
             </div>
             <div class="img-btn" style="background-image: url('2.png');" onclick="loadPage('song/index.html')">
-                <div class="btn-label">Song Cube</div>
+                <div class="btn-label">Song Ind</div>
             </div>
             <div class="img-btn" style="background-image: url('3.png');" onclick="loadPage('willy/index.html')">
                 <div class="btn-label">Wet Willy</div>
@@ -138,7 +138,7 @@
             <div class="img-btn" style="background-image: url('4.png');" onclick="loadPage('professor/index.html')">
                 <div class="btn-label">Professor</div>
             </div>
-            <div class="img-btn" style="background-image: url('5.png');" onclick="loadPage('missingyou/index.html')">
+            <div class="img-btn" style="background-image: url('e.png');" onclick="loadPage('missingyou/index.html')">
                 <div class="btn-label">Missing You</div>
             </div>
             <div class="img-btn" style="background-image: url('6.png');" onclick="loadPage('new/index.html')">
