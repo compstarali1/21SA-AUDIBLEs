@@ -1,201 +1,246 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=10">
-  <title>3D Music Cube - Auto Play</title>
-<style>
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  /* Use your GIF URL here */
-  background: url("https://iili.io/BVfTbLX.gif") no-repeat center center;
-  background-size: cover;
-  opacity: 0.5; /* Set to 0.5 opacity as requested */
-  z-index: -1;   /* Places it behind all other elements */
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Modern 3D 8-Face Cube</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: black; /* Base color for the darkening effect */
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none;
+        }
 
-/* Ensure body background doesn't block the pseudo-element */
-body {
-  background: #000; /* Base color for the transparency to bleed into */
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-*, *::before, *::after { box-sizing: border-box; font-family: "Poppins", sans-serif; transform-style: preserve-3d; }
-body { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100vw; height: 100vh; overflow: hidden; background: #111; margin: 0; }
+        /* Background Image with 0.4 opacity darkening */
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('bg.gif');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.4; /* Set to 0.4 as requested */
+            z-index: -1;
+        }
 
-/* Initial Overlay to allow Autoplay */
-#overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); z-index: 1000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: white; cursor: pointer;
-}
+        /* Close Button */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: background 0.3s;
+        }
 
-.container-3D { position: relative; display: flex; flex-direction: column; align-items: center; width: 280px; height: 480px; perspective: 1200px; }
-.flopper { position: relative; width: 100%; height: 380px; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .close-btn:hover {
+            background: rgba(255, 0, 0, 0.5);
+        }
 
-figure {
-  display: flex; flex-direction: column; position: absolute; width: 100%; height: 100%;
-  padding: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);
-  margin: 0; backface-visibility: hidden; border-radius: 10px; background: #333;
-}
+        /* Progress Bar Container */
+        .progress-wrapper {
+            position: absolute;
+            top: 80px;
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
 
-figure div.img-bg { width: 100%; flex: 1; background-size: cover !important; background-position: center !important; border-radius: 6px; }
-figure h2 { font-size: 15pt; margin: 10px 0 2px 0; text-align: center; color: white; }
-figure p { font-size: 9pt; margin: 0 0 10px 0; text-align: center; opacity: 0.7; color: white; }
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
 
-/* 3D Glass Buttons */
-.glass-btn-container { position: absolute; bottom: 50px; left: 15px; display: flex; gap: 8px; transform: translateZ(10px); }
-.glass-btn {
-  width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.3); color: white; transition: 0.3s;
-}
+        .progress-bar {
+            width: 12.5%; 
+            height: 100%;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.7);
+            transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-/* Cube Faces */
-.front  { transform: translateZ(140px); }
-.back   { transform: rotateY(180deg) translateZ(140px); }
-.top    { transform: rotateX(90deg) translateZ(140px); }
-.bottom { transform: rotateX(-90deg) translateZ(140px); }
-.left   { transform: rotateY(-90deg) translateZ(140px); }
-.right  { transform: rotateY(90deg) translateZ(140px); }
+        .progress-text {
+            color: white;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
 
-.nav-bar { position: absolute; bottom: 0; display: flex; gap: 10px; width: 100%; justify-content: space-between; padding: 10px; z-index: 100; }
-.nav-btn { flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; background: #222; border: 1px solid #555; color: white; font-size: 18pt; cursor: pointer; border-radius: 8px; box-shadow: 0 4px 0 #000; }
-.nav-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
-</style>
+        .scene {
+            width: 250px;
+            height: 250px;
+            perspective: 1200px;
+            margin-top: 50px;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            /* Elastic/Spring transition */
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .face {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 5px;
+        }
+
+        /* 8 faces positioned in a circle */
+        .f1 { transform: rotateY(0deg) translateZ(301px); background-image: url('1.gif'); }
+        .f2 { transform: rotateY(45deg) translateZ(301px); background-image: url('2.jpg'); }
+        .f3 { transform: rotateY(90deg) translateZ(301px); background-image: url('3.gif'); }
+        .f4 { transform: rotateY(135deg) translateZ(301px); background-image: url('4.gif'); }
+        .f5 { transform: rotateY(180deg) translateZ(301px); background-image: url('5.gif'); }
+        .f6 { transform: rotateY(225deg) translateZ(301px); background-image: url('6.gif'); }
+        .f7 { transform: rotateY(270deg) translateZ(301px); background-image: url('7.gif'); }
+        .f8 { transform: rotateY(315deg) translateZ(301px); background-image: url('8.gif'); }
+
+        .instruction {
+            position: absolute;
+            bottom: 40px;
+            color: white;
+            opacity: 0.4;
+            pointer-events: none;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
 
-<div id="overlay" onclick="startApp()">
-    <h1>CLICK TO START</h1>
-    <p>Required to enable audio</p>
-</div>
+    <div class="bg-overlay"></div>
+    <button class="close-btn" onclick="closeSubProgram()">×</button>
 
-<div class="container-3D">
-    <div class="flopper" id="cube">
-        <!-- Face 6 -->
-        <figure class="front" data-song="6">
-            <div class="img-bg" style="background: url('https://iili.io/BGEEtm7.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(6)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 6</h2><p>Auto-playing...</p>
-        </figure>
-        <!-- Face 5 -->
-        <figure class="back" data-song="5">
-            <div class="img-bg" style="background: url('https://iili.io/BGEEbI9.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(5)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 5</h2><p>Auto-playing...</p>
-        </figure>
-        <!-- Face 4 -->
-        <figure class="top" data-song="4">
-            <div class="img-bg" style="background: url('https://iili.io/BGEEQ72.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(4)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 4</h2><p>Auto-playing...</p>
-        </figure>
-        <!-- Face 3 -->
-        <figure class="bottom" data-song="3">
-            <div class="img-bg" style="background: url('https://iili.io/BGcIGj9.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(3)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 3</h2><p>Auto-playing...</p>
-        </figure>
-        <!-- Face 2 -->
-        <figure class="left" data-song="2">
-            <div class="img-bg" style="background: url('https://iili.io/BGEEpLu.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(2)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 2</h2><p>Auto-playing...</p>
-        </figure>
-        <!-- Face 1 -->
-        <figure class="right" data-song="1">
-            <div class="img-bg" style="background: url('https://iili.io/BGEGJrx.png')"></div>
-            <div class="glass-btn-container"><div class="glass-btn" onclick="manualPlay(1)">▶</div><div class="glass-btn" onclick="stopAudio()">■</div></div>
-            <h2>Song 1</h2><p>Auto-playing...</p>
-        </figure>
+    <div class="progress-wrapper">
+        <div class="progress-text">Face <span id="faceNum">1</span> / 8</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-btn" onclick="rotate('left')">←</div>
-        <div class="nav-btn" onclick="rotate('down')">↓</div>
-        <div class="nav-btn" onclick="rotate('up')">↑</div>
-        <div class="nav-btn" onclick="rotate('right')">→</div>
+    <div class="scene">
+        <div class="cube" id="cube">
+            <div class="face f1"></div>
+            <div class="face f2"></div>
+            <div class="face f3"></div>
+            <div class="face f4"></div>
+            <div class="face f5"></div>
+            <div class="face f6"></div>
+            <div class="face f7"></div>
+            <div class="face f8"></div>
+        </div>
     </div>
-</div>
 
-<script>
-    let rotateY = 0;
-    let rotateX = 0;
-    let currentAudio = new Audio();
-    let isStarted = false;
-    const cube = document.getElementById('cube');
+    <div class="instruction">Swipe Left or Right</div>
 
-    // Mappings of Rotation -> Face shown
-    function getVisibleSong() {
-        // Simple logic to find face based on 90deg increments
-        let normX = ((rotateX % 360) + 360) % 360;
-        let normY = ((rotateY % 360) + 360) % 360;
-
-        if (normX === 90 || normX === 270) {
-            return normX === 90 ? 3 : 4; // Bottom / Top
-        }
-        if (normY === 0) return 6;    // Front
-        if (normY === 90) return 2;   // Left (rotated 90)
-        if (normY === 180) return 5;  // Back
-        if (normY === 270) return 1;  // Right
-        return 6;
-    }
-
-    function startApp() {
-        document.getElementById('overlay').style.display = 'none';
-        isStarted = true;
-        autoPlayCurrentFace();
-    }
-
-    function rotate(direction) {
-        if (direction === 'left') rotateY -= 90;
-        if (direction === 'right') rotateY += 90;
-        if (direction === 'up') rotateX += 90;
-        if (direction === 'down') rotateX -= 90;
-
-        cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    <script>
+        const cube = document.getElementById('cube');
+        const progressBar = document.getElementById('progressBar');
+        const faceNumDisplay = document.getElementById('faceNum');
         
-        if(isStarted) {
-            // Wait for rotation to finish, then play
-            setTimeout(autoPlayCurrentFace, 800);
+        let currentStep = 0;
+        let startX = 0;
+        let isDragging = false;
+
+        const audios = Array.from({ length: 8 }, (_, i) => {
+            const a = new Audio(`${i + 1}.mp3`);
+            return a;
+        });
+
+        function closeSubProgram() {
+            window.parent.postMessage('close', '*'); 
+            window.close();
+            document.body.style.display = 'none'; 
         }
-    }
 
-    function autoPlayCurrentFace() {
-        const songToPlay = getVisibleSong();
-        playAudio(songToPlay);
-    }
+        function updateUI(index) {
+            let normalized = ((index % 8) + 8) % 8;
+            let faceIndex = normalized + 1;
+            progressBar.style.width = `${(faceIndex / 8) * 100}%`;
+            faceNumDisplay.innerText = faceIndex;
+        }
 
-    function manualPlay(num) {
-        if(!isStarted) return;
-        playAudio(num);
-    }
+        function playFaceAudio(index) {
+            audios.forEach(a => { a.pause(); a.currentTime = 0; });
+            let normalized = ((index % 8) + 8) % 8;
+            audios[normalized].play().catch(e => console.log("Audio trigger failed"));
+        }
 
-    function playAudio(num) {
-        const file = num + ".mp3";
-        console.log("Playing: " + file);
-        currentAudio.pause();
-        currentAudio.src = file;
-        currentAudio.play().catch(e => console.log("Audio file missing: " + file));
-    }
+        function rotateCube(direction) {
+            if (direction === 'left') currentStep++;
+            else currentStep--;
+            
+            cube.style.transform = `rotateY(${currentStep * -45}deg)`;
+            
+            playFaceAudio(currentStep);
+            updateUI(currentStep);
+        }
 
-    function stopAudio() {
-        currentAudio.pause();
-    }
-</script>
+        const handleStart = (e) => {
+            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            isDragging = true;
+        };
 
+        const handleEnd = (e) => {
+            if (!isDragging) return;
+            const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) {
+                rotateCube(diff > 0 ? 'left' : 'right');
+            }
+            isDragging = false;
+        };
+
+        window.addEventListener('mousedown', handleStart);
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('touchstart', handleStart);
+        window.addEventListener('touchend', handleEnd);
+
+        updateUI(0);
+
+        document.body.addEventListener('click', () => {
+            if (audios[0].paused && currentStep === 0) playFaceAudio(0);
+        }, { once: true });
+    </script>
 </body>
 </html>
