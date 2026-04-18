@@ -165,5 +165,44 @@
             }
         });
     </script>
+    <script>
+    // 1. REPLACE THIS URL with your Google Script Web App URL
+    const LOG_API_URL = "https://script.google.com/macros/s/AKfycbyLFWNZQRH9wMzHDey_zFVkhPkqMpszVTOGy-EHkwWJKb6uUXRL9YHhOwDFcw-KfVMu/exec";
+
+    // 2. Function to send data silently
+    function logEvent(eventType, detail) {
+        fetch(LOG_API_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Keeps it silent and simple
+            body: JSON.stringify({
+                event: eventType,
+                details: detail
+            })
+        });
+    }
+
+    // 3. Log "App Opened" immediately when script runs
+    window.addEventListener('load', () => {
+        logEvent("APP_OPEN", "User visited the portal");
+    });
+
+    // 4. Updated Heart Function (No email app opens)
+    function sendLikeEmail() {
+        const heart = document.getElementById('heart-btn');
+        
+        // Visual Feedback
+        heart.innerText = '💖';
+        heart.style.textShadow = "0 0 30px #00f2ff";
+        
+        // Log the Like event to your history file
+        logEvent("LIKE_CLICKED", "Someone pressed the heart icon");
+
+        // Optional: brief alert or toast
+        setTimeout(() => { 
+            heart.innerText = '❤️'; 
+            heart.style.textShadow = "0 0 15px rgba(255, 77, 77, 0.8)";
+        }, 2000);
+    }
+</script>
 </body>
 </html>
