@@ -9,7 +9,7 @@
             --frost: rgba(255, 255, 255, 0.15);
             --border: rgba(255, 255, 255, 0.6);
             --accent: #00f2ff;
-            --sidebar-width: 139px; /* Reduced by 10% */
+            --sidebar-width: 139px;
             --top-bar-height: 50px;
         }
 
@@ -30,10 +30,35 @@
             z-index: -1;
         }
 
-        /* Sidebar container */
+        /* --- HEART BUTTON STYLING --- */
+        #heart-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            font-size: 45px;
+            color: #ff4d4d;
+            cursor: pointer;
+            z-index: 3000;
+            text-shadow: 0 0 15px rgba(255, 77, 77, 0.8);
+            transition: transform 0.2s ease;
+            user-select: none;
+            animation: pulse 2s infinite;
+        }
+
+        #heart-btn:hover {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
         #sidebar {
             position: fixed; 
-            left: calc(-1 * var(--sidebar-width)); /* Hidden off-screen */
+            left: calc(-1 * var(--sidebar-width));
             top: 0; height: 100%; width: var(--sidebar-width);
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(15px);
@@ -41,15 +66,14 @@
             display: flex; flex-direction: column;
             padding: 5px 0;
             transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2002; /* Higher than iframe */
+            z-index: 2002;
             gap: 3px;
         }
         #sidebar.open { transform: translateX(var(--sidebar-width)); }
 
-        /* The TONGUE attached to the Sidebar */
         #menu-tongue {
             position: absolute; 
-            right: -41px; /* Sticks out to the right of the sidebar edge */
+            right: -41px; 
             top: 50%; transform: translateY(-50%);
             width: 28px; height: 70px; 
             background: #000; border: 1px solid var(--accent);
@@ -59,16 +83,13 @@
         }
         #menu-tongue span { writing-mode: vertical-rl; font-weight: bold; color: var(--accent); font-size: 11px; }
 
-        .merged-group {
-            display: flex; flex-direction: column;
-            flex-grow: 1; gap: 3px; height: 100%;
-        }
+        .merged-group { display: flex; flex-direction: column; flex-grow: 1; gap: 3px; height: 100%; }
 
         .img-btn {
             width: 135px; margin: 0 auto;
             flex-grow: 1; border: 1px solid var(--border);
             border-radius: 8px; cursor: pointer; overflow: hidden;
-            background-size: 150px 75px; /* Dimensions kept exactly the same */
+            background-size: cover;
             background-repeat: no-repeat; background-position: center;
             display: flex; align-items: center; justify-content: center;
         }
@@ -90,13 +111,15 @@
 </head>
 <body>
 
+    <!-- Heart Button -->
+    <div id="heart-btn" onclick="sendLikeEmail()">❤️</div>
+
     <div class="video-bar">
         <button class="vid-btn" onclick="openVideo('vid1.mp4')">trailer1 Book</button>
         <button class="vid-btn" onclick="openVideo('vid2.mp4')">trailer2</button>
         <button class="vid-btn" onclick="openVideo('vid3.mp4')">Missing-You Ebooks</button>
     </div>
 
-    <!-- Sidebar now contains the tongue inside it -->
     <div id="sidebar">
         <div id="menu-tongue" onclick="toggleSidebar()">
             <span>MENU</span>
@@ -135,7 +158,6 @@
         const viewport = document.getElementById('main-viewport');
         const resetBtn = document.getElementById('reset-btn');
 
-        // This function toggles the menu: if open it closes, if closed it opens
         function toggleSidebar() {
             sidebar.classList.toggle('open');
         }
@@ -155,54 +177,50 @@
 
         function openLocked() {
             let pin = prompt("Enter PIN:");
-            if(pin === "1234") loadPage('interactive/index.html');
+            if(pin === "1111") loadPage('interactive/index.html');
         }
 
-        // Close if clicking anywhere outside the sidebar (even if iframe is active)
         window.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('open') && !sidebar.contains(e.target)) {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target.id !== 'menu-tongue') {
                 sidebar.classList.remove('open');
             }
         });
-    </script>
-    <script>
-    // 1. REPLACE THIS URL with your Google Script Web App URL
-    const LOG_API_URL = "https://script.google.com/macros/s/AKfycbyLFWNZQRH9wMzHDey_zFVkhPkqMpszVTOGy-EHkwWJKb6uUXRL9YHhOwDFcw-KfVMu/exec";
 
-    // 2. Function to send data silently
-    function logEvent(eventType, detail) {
-        fetch(LOG_API_URL, {
-            method: 'POST',
-            mode: 'no-cors', // Keeps it silent and simple
-            body: JSON.stringify({
-                event: eventType,
-                details: detail
-            })
+        // --- GOOGLE SHEETS LOGGING LOGIC ---
+        const LOG_API_URL = "https://script.google.com/macros/s/AKfycbzFk-3j0LleMY-evUIRrzHAw1Qc6ZMKx8iTSDOa-4Turzyjq3SqmzB8Kibv6Y97kPz0/exec";
+
+        function logEvent(eventType, detail) {
+            fetch(LOG_API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    event: eventType,
+                    details: detail
+                })
+            });
+        }
+
+        // Log "App Opened" immediately
+        window.addEventListener('load', () => {
+            logEvent("APP_OPEN", "User visited the portal");
         });
-    }
 
-    // 3. Log "App Opened" immediately when script runs
-    window.addEventListener('load', () => {
-        logEvent("APP_OPEN", "User visited the portal");
-    });
+        // Heart Click Function (Logs to Google Sheets)
+        function sendLikeEmail() {
+            const heart = document.getElementById('heart-btn');
+            
+            // Visual Feedback
+            heart.innerText = '💖';
+            heart.style.textShadow = "0 0 30px #00f2ff";
+            
+            // Log the Like event
+            logEvent("LIKE_CLICKED", "Someone pressed the heart icon");
 
-    // 4. Updated Heart Function (No email app opens)
-    function sendLikeEmail() {
-        const heart = document.getElementById('heart-btn');
-        
-        // Visual Feedback
-        heart.innerText = '💖';
-        heart.style.textShadow = "0 0 30px #00f2ff";
-        
-        // Log the Like event to your history file
-        logEvent("LIKE_CLICKED", "Someone pressed the heart icon");
-
-        // Optional: brief alert or toast
-        setTimeout(() => { 
-            heart.innerText = '❤️'; 
-            heart.style.textShadow = "0 0 15px rgba(255, 77, 77, 0.8)";
-        }, 2000);
-    }
-</script>
+            setTimeout(() => { 
+                heart.innerText = '❤️'; 
+                heart.style.textShadow = "0 0 15px rgba(255, 77, 77, 0.8)";
+            }, 2000);
+        }
+    </script>
 </body>
 </html>
