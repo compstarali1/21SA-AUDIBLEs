@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Modern 3D 8-Face Cube</title>
+    <title>Modern 3D 8-Face Cube - 30% Decreased</title>
     <style>
         body {
             margin: 0;
@@ -12,13 +12,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: black; /* Base color for the darkening effect */
+            background-color: black; 
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             touch-action: none;
         }
 
-        /* Background Image with 0.4 opacity darkening */
         .bg-overlay {
             position: fixed;
             top: 0;
@@ -28,11 +27,10 @@
             background-image: url('bg.gif');
             background-size: cover;
             background-position: center;
-            opacity: 0.4; /* Set to 0.4 as requested */
+            opacity: 0.4; 
             z-index: -1;
         }
 
-        /* Close Button */
         .close-btn {
             position: absolute;
             top: 20px;
@@ -56,11 +54,10 @@
             background: rgba(255, 0, 0, 0.5);
         }
 
-        /* Progress Bar Container */
         .progress-wrapper {
             position: absolute;
             top: 80px;
-            width: 280px;
+            width: 200px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -70,7 +67,7 @@
 
         .progress-container {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             overflow: hidden;
@@ -87,17 +84,16 @@
 
         .progress-text {
             color: white;
-            font-size: 14px;
+            font-size: 12px;
             letter-spacing: 2px;
             text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .scene {
-            width: 250px;
-            height: 250px;
-            perspective: 1200px;
-            margin-top: 50px;
+            width: 175px; /* Decreased by 30% from 250px */
+            height: 175px; /* Decreased by 30% from 250px */
+            perspective: 1000px;
+            margin-top: 20px;
         }
 
         .cube {
@@ -105,16 +101,15 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            /* Elastic/Spring transition */
             transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         .face {
             position: absolute;
-            width: 250px;
-            height: 250px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            width: 175px; /* Decreased by 30% */
+            height: 175px; /* Decreased by 30% */
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
             background-size: cover;
             background-position: center;
             display: flex;
@@ -122,18 +117,18 @@
             justify-content: center;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
-        /* 8 faces positioned in a circle */
-        .f1 { transform: rotateY(0deg) translateZ(301px); background-image: url('1.gif'); }
-        .f2 { transform: rotateY(45deg) translateZ(301px); background-image: url('2.jpg'); }
-        .f3 { transform: rotateY(90deg) translateZ(301px); background-image: url('3.gif'); }
-        .f4 { transform: rotateY(135deg) translateZ(301px); background-image: url('4.gif'); }
-        .f5 { transform: rotateY(180deg) translateZ(301px); background-image: url('5.gif'); }
-        .f6 { transform: rotateY(225deg) translateZ(301px); background-image: url('6.gif'); }
-        .f7 { transform: rotateY(270deg) translateZ(301px); background-image: url('7.gif'); }
-        .f8 { transform: rotateY(315deg) translateZ(301px); background-image: url('8.gif'); }
+        /* 8 faces positioned with adjusted translateZ (211px) for the smaller size */
+        .f1 { transform: rotateY(0deg) translateZ(211px); background-image: url('1.gif'); }
+        .f2 { transform: rotateY(45deg) translateZ(211px); background-image: url('2.jpg'); }
+        .f3 { transform: rotateY(90deg) translateZ(211px); background-image: url('3.gif'); }
+        .f4 { transform: rotateY(135deg) translateZ(211px); background-image: url('4.gif'); }
+        .f5 { transform: rotateY(180deg) translateZ(211px); background-image: url('5.gif'); }
+        .f6 { transform: rotateY(225deg) translateZ(211px); background-image: url('6.gif'); }
+        .f7 { transform: rotateY(270deg) translateZ(211px); background-image: url('7.gif'); }
+        .f8 { transform: rotateY(315deg) translateZ(211px); background-image: url('8.gif'); }
 
         .instruction {
             position: absolute;
@@ -141,7 +136,8 @@
             color: white;
             opacity: 0.4;
             pointer-events: none;
-            font-size: 12px;
+            font-size: 11px;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -170,7 +166,7 @@
         </div>
     </div>
 
-    <div class="instruction">Swipe Left or Right</div>
+    <div class="instruction"><h2>Swipe Left or Right</h2></div>
 
     <script>
         const cube = document.getElementById('cube');
@@ -244,3 +240,4 @@
     </script>
 </body>
 </html>
+
