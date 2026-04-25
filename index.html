@@ -2,225 +2,331 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title>Media Portal</title>
     <style>
         :root {
-            --frost: rgba(255, 255, 255, 0.15);
-            --border: rgba(255, 255, 255, 0.6);
-            --accent: #00f2ff;
-            --sidebar-width: 139px;
-            --top-bar-height: 50px;
+            --bg: #0a0a0a;
+            --accent: #ff0055;
+            --glass: rgba(20, 20, 20, 0.95);
+            --border: rgba(255, 255, 255, 0.2);
+            --sidebar-width: 200px; /* Widened by 25% */
         }
 
         body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
             font-family: 'Segoe UI', sans-serif;
-            background-color: black;
-            overflow: hidden;
-            color: white;
+            background-color: var(--bg);
+            overflow: hidden; color: white;
         }
 
         body::before {
             content: "";
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('bg2.gif') no-repeat center center fixed;
+            background: url('bg3.gif') no-repeat center center fixed;
             background-size: cover;
-            opacity: 0.7;
+            opacity: 0.3; /* Opacity at 0.7 */
             z-index: -1;
+            pointer-events: none;
         }
 
-        /* --- HEART BUTTON STYLING --- */
-        #heart-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            font-size: 45px;
-            color: #ff4d4d;
-            cursor: pointer;
-            z-index: 3000;
-            text-shadow: 0 0 15px rgba(255, 77, 77, 0.8);
-            transition: transform 0.2s ease;
-            user-select: none;
-            animation: pulse 2s infinite;
+        /* --- SIDEBAR --- */
+        #sidebar { 
+            position: fixed; left: 0; top: 0; height: 100%; 
+            width: var(--sidebar-width); 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            border-right: 4px solid var(--accent); /* Visible Line */
+            z-index: 9998; 
+            /* Start hidden: shifted left exactly by its width minus a tiny sliver for the line */
+            transform: translateX(calc(-1 * var(--sidebar-width))); 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        #heart-btn:hover {
-            transform: scale(1.2);
-            filter: brightness(1.2);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        #sidebar {
-            position: fixed; 
-            left: calc(-1 * var(--sidebar-width));
-            top: 0; height: 100%; width: var(--sidebar-width);
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(15px);
-            border-right: 5px solid var(--accent);
-            display: flex; flex-direction: column;
-            padding: 5px 0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2002;
-            gap: 3px;
-        }
-        #sidebar.open { transform: translateX(var(--sidebar-width)); }
-
-        #menu-tongue {
+        
+        #sidebar.open { transform: translateX(0); }
+        
+        #menu-tongue { 
             position: absolute; 
-            right: -41px; 
-            top: 50%; transform: translateY(-50%);
-            width: 28px; height: 70px; 
-            background: #000; border: 1px solid var(--accent);
-            border-left: none; border-radius: 0 50px 50px 0;
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer;
+            right: -48px; /* Protrudes outside the sidebar */
+            top: 75%; transform: translateY(-50%); 
+            width: 48px; height: 100px; 
+            background: var(--accent); 
+            border-radius: 0 20px 20px 0; 
+            display: flex; align-items: center; 
+            justify-content: center; cursor: pointer; 
+            box-shadow: 5px 0 15px rgba(255, 0, 85, 0.4);
+            z-index: 9999;
         }
-        #menu-tongue span { writing-mode: vertical-rl; font-weight: bold; color: var(--accent); font-size: 11px; }
+        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: white; font-size: 14px; }
+        
+        /* --- EQUAL SPACING BUTTONS --- */
+        .merged-group { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            padding: 10px; 
+            box-sizing: border-box;
+            gap: 10px; 
+        }
+        
+        .img-btn { 
+            width: 100%; 
+            flex: 1; /* All buttons take equal height */
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            cursor: pointer; 
+            background-size: cover; 
+            background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        
+        /* TINY MARGIN AT BOTTOM */
+        .img-btn:last-child { margin-bottom: 5px; }
 
-        .merged-group { display: flex; flex-direction: column; flex-grow: 1; gap: 3px; height: 100%; }
+        .btn-label { color: white; font-size: 12px; font-weight: 900; background: rgba(0,0,0,0.6); width: 100%; text-align: center; text-transform: uppercase; }
 
-        .img-btn {
-            width: 135px; margin: 0 auto;
-            flex-grow: 1; border: 1px solid var(--border);
-            border-radius: 8px; cursor: pointer; overflow: hidden;
-            background-size: cover;
-            background-repeat: no-repeat; background-position: center;
+        /* --- VIDEO POPUP --- */
+        #video-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+        }
+        #video-popup {
+            position: relative; width: 85%; max-width: 450px; background: #000;
+            border: 3px solid var(--border); border-radius: 40px;
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.8); transition: 0.3s;
+        }
+        #video-overlay.active #video-popup { transform: scale(1); }
+        
+        .close-popup {
+            position: absolute; top: 20px; right: 20px; width: 55px; height: 55px;
+            background: #fff; border: none; color: #000; font-size: 30px;
+            cursor: pointer; border-radius: 50%; z-index: 10005;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .locked-btn { flex-grow: 1; background-image: url('X.png'); border-color: #ff4d4d; }
-
-        .btn-label {
-            color: white; font-size: 14px; font-weight: 900;
-            text-transform: uppercase; text-align: center;
-            text-shadow: 0 0 10px black, 0 0 15px black, 0 0 5px var(--accent);
-            pointer-events: none; width: 100%;
-        }
-
-        .video-bar { position: fixed; top: 0; right: 0; display: flex; z-index: 2005; height: var(--top-bar-height); }
-        .vid-btn { width: 90px; height: var(--top-bar-height); background: var(--frost); backdrop-filter: blur(10px); border: 1px solid var(--border); color: white; cursor: pointer; }
-
-        #main-viewport { position: fixed; top: 50px; left: 0; width: 100%; height: calc(100% - 50px); border: none; z-index: 1; display: none; }
+        .video-bar { position: fixed; top: 0; right: 0; display: flex; z-index: 9997; height: 50px; background: rgba(0,0,0,0.5); }
+        .vid-btn { width: 110px; height: 50px; background: transparent; border: none; border-left: 1px solid var(--border); color: white; cursor: pointer; font-weight: bold; }
+        #heart-btn { position: fixed; bottom: 20px; right: 20px; font-size: 45px; cursor: pointer; z-index: 9999; }
+        #main-viewport { position: fixed; top: 50px; left: 0; width: 100%; height: calc(100% - 50px); border: none; display: none; z-index: 1; background: #000; }
     </style>
 </head>
 <body>
 
-    <!-- Heart Button -->
+    <!-- VIDEO POPUP -->
+    <div id="video-overlay" onclick="closePopup()">
+        <div id="video-popup" onclick="event.stopPropagation()">
+            <button class="close-popup" onclick="closePopup()">✕</button>
+            <video id="popup-video-player" playsinline><source src="" type="video/mp4"></video>
+            <div style="padding:25px; background:#111;">
+                <input type="range" id="seekbar" value="0" step="0.1" style="width:100%; accent-color: var(--accent);">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-top:8px;">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="heart-btn" onclick="sendLikeEmail()">❤️</div>
 
     <div class="video-bar">
-        <button class="vid-btn" onclick="openVideo('vid1.mp4')">trailer1 Book</button>
-        <button class="vid-btn" onclick="openVideo('vid2.mp4')">trailer2</button>
-        <button class="vid-btn" onclick="openVideo('vid3.mp4')">Missing-You Ebooks</button>
+        <button class="vid-btn" onclick="playPopupVideo('vid1.mp4')">Trailer 1</button>
+        <button class="vid-btn" onclick="playPopupVideo('vid2.mp4')">Trailer 2</button>
+        <button class="vid-btn" onclick="playPopupVideo('vid3.mp4')">Ebooks</button>
     </div>
 
     <div id="sidebar">
-        <div id="menu-tongue" onclick="toggleSidebar()">
-            <span>MENU</span>
-        </div>
-        
+        <!-- Tongue is inside the sidebar so it moves WITH the sidebar -->
+        <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div>
         <div class="merged-group">
-            <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')">
-                <div class="btn-label">Share Media</div>
-            </div>
-            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('song/index.html')">
-                <div class="btn-label">Song Ind</div>
-            </div>
-            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('willy/index.html')">
-                <div class="btn-label">Wet Willy</div>
-            </div>
-            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')">
-                <div class="btn-label">Professor</div>
-            </div>
-            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')">
-                <div class="btn-label">Missing You</div>
-            </div>
-            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')">
-                <div class="btn-label">Wet Revenge</div>
-            </div>
-            <div class="img-btn locked-btn" onclick="openLocked()">
-                <div class="btn-label" style="color:#ff4d4d">LOCKED</div>
-            </div>
+            <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div>
+            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('song/index.html')"><div class="btn-label">Song</div></div>
+            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('willy/index.html')"><div class="btn-label">Willy</div></div>
+            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')"><div class="btn-label">Professor</div></div>
+            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">Missing</div></div>
+            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')"><div class="btn-label">Revenge</div></div>
+            <div class="img-btn" style="border-color:red" onclick="openLocked()"><div class="btn-label" style="color:red">LOCKED</div></div>
         </div>
     </div>
 
     <iframe id="main-viewport"></iframe>
-    <button id="reset-btn" style="display:none; position:fixed; top:10px; left:10px; z-index:2006; background:red; color:white; border:none; padding:10px; border-radius:5px;" onclick="resetPage()">CLOSE [X]</button>
+<style>
+@charset "UTF-8";
+@import url(https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800);
+
+/* Property registration for animation */
+@property --item-rotateY {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+/* Container styling */
+.wheel-container {
+    margin-left: 5%; /* 5% margin gap for auto-hidden menu */
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background: transparent; /* Fully transparent background */
+    overflow: hidden;
+}
+
+.wheel-list {
+    --n: 10; /* Number of items */
+    --duration: 30s;
+    --caro-tiltZ: 20deg;
+    --caro-tiltX: 4deg;
+    --caro-max-radius: 58em;
+    /* Responsive radius based on screen width */
+    --caro-radius: min(35vw, var(--caro-max-radius));
+    --caro-omtrek: calc(2 * 3.141592653589793 * var(--caro-radius));
+    
+    /* Variable width calculations */
+    --item-spacing: 0.5;
+    --item-size-bruto: calc(var(--caro-omtrek) / var(--n));
+    --item-size-netto: calc(var(--item-size-bruto) / (1 + var(--item-spacing)));
+    
+    --item-tiltX: 15deg;
+    
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: grid;
+    perspective: 100vw;
+    transform-style: preserve-3d;
+    opacity: 0.9; /* Whole wheel opacity */
+}
+
+/* Individual Item Animation & Positioning */
+.wheel-item {
+    grid-area: 1/1;
+    width: var(--item-size-netto);
+    /* Set index variables for timing */
+    --delay: calc(var(--duration) / var(--n) * var(--i) - var(--duration));
+    
+    transform:
+        rotateZ(var(--caro-tiltZ))
+        rotateX(var(--caro-tiltX))
+        rotateY(var(--item-rotateY))
+        translateZ(var(--caro-radius))
+        rotateX(var(--item-tiltX));
+    
+    animation: item-rotateY var(--duration) var(--delay) infinite linear;
+}
+
+/* Child indices for timing */
+.wheel-item:nth-child(1) { --i:1; }
+.wheel-item:nth-child(2) { --i:2; }
+.wheel-item:nth-child(3) { --i:3; }
+.wheel-item:nth-child(4) { --i:4; }
+.wheel-item:nth-child(5) { --i:5; }
+.wheel-item:nth-child(6) { --i:6; }
+.wheel-item:nth-child(7) { --i:7; }
+.wheel-item:nth-child(8) { --i:8; }
+.wheel-item:nth-child(9) { --i:9; }
+.wheel-item:nth-child(10) { --i:10; }
+
+@keyframes item-rotateY {
+    100% { --item-rotateY: 360deg; }
+}
+
+/* Image Styling: 3D Border & Shadows */
+.wheel-img {
+    height: 160px;
+    width: 120px; /* Spans the width of the variable LI */
+    object-fit: cover;
+    display: block;
+    
+    /* 3D Border & Deep Shadows */
+    border: 4px solid #1a1a1a; /* Thick dark border */
+    border-radius: 8px;
+    box-shadow: 
+        10px 10px 20px rgba(0,0,0,0.6), 
+        -2px -2px 5px rgba(255,255,255,0.05); 
+        
+    /* Maintain the transparent fade mask */
+    mask: linear-gradient(45deg, transparent, red);
+    -webkit-mask: linear-gradient(45deg, transparent, red);
+}
+</style>
+
+<section class="wheel-container">
+    <ul class="wheel-list">
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpCmX.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpzLG.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpxXs.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpoIn.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpTBf.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpArl.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lp522.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lp77S.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpYk7.jpg" alt="" /></li>
+        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpap9.jpg" alt="" /></li>
+    </ul>
+</section>
 
     <script>
         const sidebar = document.getElementById('sidebar');
-        const viewport = document.getElementById('main-viewport');
-        const resetBtn = document.getElementById('reset-btn');
+        const overlay = document.getElementById('video-overlay');
+        const video = document.getElementById('popup-video-player');
+        const seekbar = document.getElementById('seekbar');
 
-        function toggleSidebar() {
+        function toggleSidebar(e) {
+            e.stopPropagation();
             sidebar.classList.toggle('open');
         }
 
+        function playPopupVideo(src) {
+            video.src = src;
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.classList.add('active'), 10);
+            video.play();
+        }
+
+        function closePopup() {
+            overlay.classList.remove('active');
+            video.pause();
+            setTimeout(() => overlay.style.display = 'none', 300);
+        }
+
+        video.ontimeupdate = () => {
+            const p = (video.currentTime / video.duration) * 100;
+            seekbar.value = p || 0;
+            document.getElementById('current-time').innerText = formatTime(video.currentTime);
+            document.getElementById('duration').innerText = formatTime(video.duration || 0);
+        };
+
+        seekbar.oninput = () => { video.currentTime = (seekbar.value / 100) * video.duration; };
+
+        function formatTime(s) {
+            let m = Math.floor(s / 60), sec = Math.floor(s % 60);
+            return m + ":" + (sec < 10 ? "0" + sec : sec);
+        }
+
         function loadPage(url) {
-            viewport.src = url;
-            viewport.style.display = 'block';
-            resetBtn.style.display = 'block';
+            const vp = document.getElementById('main-viewport');
+            vp.src = url; vp.style.display = 'block';
             sidebar.classList.remove('open');
         }
 
-        function resetPage() {
-            viewport.src = "";
-            viewport.style.display = 'none';
-            resetBtn.style.display = 'none';
-        }
-
         function openLocked() {
-            let pin = prompt("Enter PIN:");
-            if(pin === "1111") loadPage('interactive/index.html');
+            if(prompt("Enter PIN:") === "1111") loadPage('interactive/index.html');
         }
 
-        window.addEventListener('click', function(e) {
-            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target.id !== 'menu-tongue') {
+        function sendLikeEmail() {
+            const h = document.getElementById('heart-btn');
+            h.innerText = '💖'; setTimeout(() => h.innerText = '❤️', 2000);
+        }
+
+        // Auto-close menu when clicking the screen
+        window.onclick = (e) => {
+            if (sidebar.classList.contains('open') && !sidebar.contains(e.target)) {
                 sidebar.classList.remove('open');
             }
-        });
-
-        // --- GOOGLE SHEETS LOGGING LOGIC ---
-        const LOG_API_URL = "https://script.google.com/macros/s/AKfycbzFk-3j0LleMY-evUIRrzHAw1Qc6ZMKx8iTSDOa-4Turzyjq3SqmzB8Kibv6Y97kPz0/exec";
-
-        function logEvent(eventType, detail) {
-            fetch(LOG_API_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    event: eventType,
-                    details: detail
-                })
-            });
-        }
-
-        // Log "App Opened" immediately
-        window.addEventListener('load', () => {
-            logEvent("APP_OPEN", "User visited the portal");
-        });
-
-        // Heart Click Function (Logs to Google Sheets)
-        function sendLikeEmail() {
-            const heart = document.getElementById('heart-btn');
-            
-            // Visual Feedback
-            heart.innerText = '💖';
-            heart.style.textShadow = "0 0 30px #00f2ff";
-            
-            // Log the Like event
-            logEvent("LIKE_CLICKED", "Someone pressed the heart icon");
-
-            setTimeout(() => { 
-                heart.innerText = '❤️'; 
-                heart.style.textShadow = "0 0 15px rgba(255, 77, 77, 0.8)";
-            }, 2000);
-        }
+        };
     </script>
 </body>
 </html>
