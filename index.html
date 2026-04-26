@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Portal</title>
     <style>
         :root {
@@ -166,8 +166,8 @@
 
 /* Container styling */
 .wheel-container {
-    margin-left: 5%; /* 5% margin gap for auto-hidden menu */
-    height: 100vh;
+    margin-left: 0%; /* 5% margin gap for auto-hidden menu */
+    height: 120vh;
     display: grid;
     place-items: center;
     background: transparent; /* Fully transparent background */
@@ -177,27 +177,27 @@
 .wheel-list {
     --n: 10; /* Number of items */
     --duration: 30s;
-    --caro-tiltZ: 20deg;
-    --caro-tiltX: 4deg;
+    --caro-tiltZ: 65deg;
+    --caro-tiltX: 25deg;
     --caro-max-radius: 58em;
     /* Responsive radius based on screen width */
     --caro-radius: min(35vw, var(--caro-max-radius));
     --caro-omtrek: calc(2 * 3.141592653589793 * var(--caro-radius));
     
     /* Variable width calculations */
-    --item-spacing: 0.5;
+    --item-spacing: 0.8;
     --item-size-bruto: calc(var(--caro-omtrek) / var(--n));
     --item-size-netto: calc(var(--item-size-bruto) / (1 + var(--item-spacing)));
     
-    --item-tiltX: 15deg;
+    --item-tiltX: 5deg;
     
     margin: 0;
     padding: 0;
     list-style-type: none;
     display: grid;
-    perspective: 100vw;
+    perspective: 120vw;
     transform-style: preserve-3d;
-    opacity: 0.9; /* Whole wheel opacity */
+    opacity: 1.0; /* Whole wheel opacity */
 }
 
 /* Individual Item Animation & Positioning */
@@ -235,8 +235,8 @@
 
 /* Image Styling: 3D Border & Shadows */
 .wheel-img {
-    height: 160px;
-    width: 120px; /* Spans the width of the variable LI */
+    height: 120px;
+    width: 90px; /* Spans the width of the variable LI */
     object-fit: cover;
     display: block;
     
@@ -248,8 +248,8 @@
         -2px -2px 5px rgba(255,255,255,0.05); 
         
     /* Maintain the transparent fade mask */
-    mask: linear-gradient(45deg, transparent, red);
-    -webkit-mask: linear-gradient(45deg, transparent, red);
+    mask: linear-gradient(60deg, transparent, red);
+    -webkit-mask: linear-gradient(60deg, transparent, red);
 }
 </style>
 
@@ -267,7 +267,6 @@
         <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpap9.jpg" alt="" /></li>
     </ul>
 </section>
-
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('video-overlay');
