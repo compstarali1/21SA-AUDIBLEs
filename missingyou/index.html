@@ -10,11 +10,11 @@ body {
   margin:0;
   padding:0;
   min-height: 100vh;
-  display: cover;
+  display: flex; /* Changed from "cover" to "flex" to fix layout logic */
   flex-direction: column;
   align-items: center;
-  background-color: #121212; /* Dark Background */
-  color: #ffffff; /* White Text */
+  background-color: #121212; 
+  color: #ffffff; 
 }
 
 /* BACKGROUND IMAGE */
@@ -25,59 +25,60 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('empress.jpg'); /* Replace with your image */
+  background-image: url('empress.jpg'); 
   background-size: cover;
   background-position: center;
-  opacity: 0.3; /* Opacity 50% */
+  opacity: 0.3; 
   z-index: -1;
 }
 
-/* NEW CENTER BUTTON */
+/* NEW CENTER BUTTON - Reduced gaps and margins by 25% */
 .center-btn-container {
   display:flex;
   flex-direction: column; 
   align-items:center;
-  margin-top: 50px; /* Moved further down from top */
-  gap: 300px; /* Increased space between the two buttons */
+  margin-top: 38px; /* Reduced from 50px */
+  gap: 225px; /* Reduced from 300px */
 }
 
+/* Reduced padding and border-radius by 25% */
 .ethereal-btn{
-  padding:25px 60px;
-  font-size:24px;
+  padding: 19px 45px; /* Reduced from 25px 60px */
+  font-size: 24px; /* Font size maintained */
   font-weight:bold;
   color:#fff;
   background:linear-gradient(145deg,#9c27b0,#3f51b5);
   border:none;
-  border-radius:12px;
+  border-radius: 9px; /* Reduced from 12px */
   cursor:pointer;
-  box-shadow:0 10px 20px rgba(0,0,0,0.4);
+  box-shadow:0 8px 15px rgba(0,0,0,0.4);
 }
 
-/* IMAGE OVERLAY */
+/* IMAGE OVERLAY - Width reduced by 25% scale factor */
 .overlay {
   position:fixed;
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:70%;
-  margin:20px;
+  width: 52.5%; /* Reduced from 70% */
+  margin: 15px; /* Reduced from 20px */
   display:none;
   z-index:999;
 }
 
 .overlay img{
   width:100%;
-  border-radius:12px;
+  border-radius: 9px; /* Reduced from 12px */
 }
 
-/* AUDIO BOXES - Positioned under buttons */
+/* AUDIO BOXES */
 .audio-box{
-  margin-top: 15px;
+  margin-top: 11px; /* Reduced from 15px */
   display:none;
 }
 
 audio {
-  width: 300px;
+  width: 225px; /* Reduced from 300px */
 }
 </style>
 </head>
@@ -92,7 +93,7 @@ audio {
     <button class="ethereal-btn" onclick="playAudio1()">Timeless Love for You</button>
     <div class="audio-box" id="audioBox1">
       <audio id="audio1" controls>
-        <source src="empress.mp3" type="audio/mpeg">
+        <source src="time.mp3" type="audio/mpeg">
       
     </div>
   </div>
@@ -102,7 +103,7 @@ audio {
     <button class="ethereal-btn" onclick="playAudio2()">The Missing-You Syndrome</button>
     <div class="audio-box" id="audioBox2">
       <audio id="audio2" controls>
-        <source src="missyou.mp3" type="audio/mpeg">
+        <source src="empress.mp3" type="audio/mpeg">
       
     </div>
   </div>
