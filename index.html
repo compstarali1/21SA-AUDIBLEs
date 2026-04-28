@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Media Portal</title>
     <style>
         :root {
@@ -57,7 +57,7 @@
             box-shadow: 5px 0 15px rgba(255, 0, 85, 0.4);
             z-index: 9999;
         }
-        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: white; font-size: 20px; }
+        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: white; font-size: 14px; }
         
         /* --- EQUAL SPACING BUTTONS --- */
         .merged-group { 
@@ -84,7 +84,7 @@
         /* TINY MARGIN AT BOTTOM */
         .img-btn:last-child { margin-bottom: 5px; }
 
-        .btn-label { color: white; font-size: 20px; font-weight: 900; background: rgba(0,0,0,0.6); width: 100%; text-align: center; text-transform: uppercase; }
+        .btn-label { color: white; font-size: 12px; font-weight: 900; background: rgba(0,0,0,0.6); width: 100%; text-align: center; text-transform: uppercase; }
 
         /* --- VIDEO POPUP --- */
         #video-overlay {
@@ -122,7 +122,7 @@
             <video id="popup-video-player" playsinline><source src="" type="video/mp4"></video>
             <div style="padding:25px; background:#111;">
                 <input type="range" id="seekbar" value="0" step="0.1" style="width:100%; accent-color: var(--accent);">
-                <div style="display: flex; justify-content: space-between; font-size: 23px; color: #888; margin-top:8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-top:8px;">
                     <span id="current-time">0:00</span>
                     <span id="duration">0:00</span>
                 </div>
@@ -166,7 +166,7 @@
 
 /* Container styling */
 .wheel-container {
-    margin-left: 0%; /* 5% margin gap for auto-hidden menu */
+    margin-left: 5%; /* 5% margin gap for auto-hidden menu */
     height: 120vh;
     display: grid;
     place-items: center;
@@ -177,19 +177,19 @@
 .wheel-list {
     --n: 10; /* Number of items */
     --duration: 30s;
-    --caro-tiltZ: 65deg;
-    --caro-tiltX: 25deg;
+    --caro-tiltZ: 45deg;
+    --caro-tiltX: 4deg;
     --caro-max-radius: 58em;
     /* Responsive radius based on screen width */
     --caro-radius: min(35vw, var(--caro-max-radius));
     --caro-omtrek: calc(2 * 3.141592653589793 * var(--caro-radius));
     
     /* Variable width calculations */
-    --item-spacing: 0.8;
+    --item-spacing: 0.7;
     --item-size-bruto: calc(var(--caro-omtrek) / var(--n));
     --item-size-netto: calc(var(--item-size-bruto) / (1 + var(--item-spacing)));
     
-    --item-tiltX: 5deg;
+    --item-tiltX: 15deg;
     
     margin: 0;
     padding: 0;
@@ -236,7 +236,7 @@
 /* Image Styling: 3D Border & Shadows */
 .wheel-img {
     height: 120px;
-    width: 90px; /* Spans the width of the variable LI */
+    width: 75px; /* Spans the width of the variable LI */
     object-fit: cover;
     display: block;
     
@@ -244,7 +244,7 @@
     border: 4px solid #1a1a1a; /* Thick dark border */
     border-radius: 8px;
     box-shadow: 
-        10px 10px 20px rgba(0,0,0,0.6), 
+        10px 20px 30px rgba(0,0,0,0.5), 
         -2px -2px 5px rgba(255,255,255,0.05); 
         
     /* Maintain the transparent fade mask */
