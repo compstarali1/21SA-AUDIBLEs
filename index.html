@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Media Portal</title>
+    <title>Premium Media Portal</title>
     <style>
         :root {
-            --bg: #0a0a0a;
+            --bg: #050505;
             --accent: #ff0055;
-            --glass: rgba(20, 20, 20, 0.95);
-            --border: rgba(255, 255, 255, 0.2);
-            --sidebar-width: 200px; /* Widened by 25% */
+            --glass: rgba(25, 25, 25, 0.85);
+            --border: rgba(255, 255, 255, 0.15);
+            --sidebar-width: 176px; /* Reduced by 20% from 220px */
+            --glow: 0 0 15px rgba(255, 0, 85, 0.4);
         }
+
+        @property --item-rotateY { syntax: "<angle>"; inherits: true; initial-value: 0deg; }
 
         body {
             margin: 0; padding: 0; height: 100vh; width: 100vw;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg);
             overflow: hidden; color: white;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
         }
 
         body::before {
@@ -25,104 +29,117 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('bg3.gif') no-repeat center center fixed;
             background-size: cover;
-            opacity: 0.3; /* Opacity at 0.7 */
-            z-index: -1;
-            pointer-events: none;
+            opacity: 0.4; z-index: -1;
         }
 
-        /* --- SIDEBAR --- */
+        /* --- TOP VIDEO BAR (20% Smaller buttons) --- */
+        .video-bar { 
+            position: fixed; top: 16px; right: 16px; 
+            display: flex; gap: 8px; z-index: 10005; 
+        }
+        .vid-btn { 
+            padding: 9px 16px; background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 24px; color: white; 
+            cursor: pointer; font-weight: 700; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+            font-size: 14px; /* Font size maintained */
+        }
+        .vid-btn:hover { background: var(--accent); transform: translateY(-2px); box-shadow: var(--glow); }
+
+        /* --- SIDEBAR (20% Shrunk Width/Gaps) --- */
         #sidebar { 
             position: fixed; left: 0; top: 0; height: 100%; 
             width: var(--sidebar-width); 
             background: var(--glass); 
-            backdrop-filter: blur(20px); 
-            border-right: 4px solid var(--accent); /* Visible Line */
-            z-index: 9998; 
-            /* Start hidden: shifted left exactly by its width minus a tiny sliver for the line */
-            transform: translateX(calc(-1 * var(--sidebar-width))); 
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(25px); 
+            border-right: 2px solid var(--accent);
+            z-index: 10010;
+            box-shadow: 16px 0 40px rgba(0,0,0,0.5);
+            transform: translateX(calc(-1 * var(--sidebar-width) + 4px)); 
+            transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        
         #sidebar.open { transform: translateX(0); }
         
         #menu-tongue { 
+            position: absolute; right: -32px; top: 50%;
+            transform: translateY(-50%); 
+            width: 32px; height: 58px; /* 20% Smaller height/width */
+            background: #000; 
+            border: 1px solid var(--border);
+            border-left: none;
+            border-radius: 0 12px 12px 0; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; z-index: 10011;
+        }
+        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: white; pointer-events: none; font-size: 11px; letter-spacing: 1px;}
+        
+        .merged-group { display: flex; flex-direction: column; height: 100%; padding: 16px 12px; box-sizing: border-box; gap: 10px; }
+        .img-btn { width: 100%; flex: 1; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; background-size: cover; background-position: center; display: flex; align-items: flex-end; transition: 0.3s; overflow: hidden; }
+        .img-btn:hover { border-color: var(--accent); transform: scale(1.02); }
+        .btn-label { color: white; font-size: 10px; font-weight: 800; background: rgba(0,0,0,0.7); width: 100%; text-align: center; padding: 6px 0; text-transform: uppercase; }
+
+        /* --- 3D WHEEL (20% Smaller items) --- */
+        .wheel-container { 
             position: absolute; 
-            right: -48px; /* Protrudes outside the sidebar */
-            top: 75%; transform: translateY(-50%); 
-            width: 48px; height: 100px; 
-            background: var(--accent); 
-            border-radius: 0 20px 20px 0; 
-            display: flex; align-items: center; 
-            justify-content: center; cursor: pointer; 
-            box-shadow: 5px 0 15px rgba(255, 0, 85, 0.4);
-            z-index: 9999;
+            top: 10%; left: 10%; right: 10%; bottom: 10%; 
+            display: grid; place-items: center; z-index: 1; pointer-events: none; 
         }
-        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: white; font-size: 14px; }
-        
-        /* --- EQUAL SPACING BUTTONS --- */
-        .merged-group { 
-            display: flex; 
-            flex-direction: column; 
-            height: 100%; 
-            padding: 10px; 
-            box-sizing: border-box;
-            gap: 10px; 
+        .wheel-list {
+            --n: 10; --duration: 30s; --caro-tiltZ: 65deg; --caro-tiltX: 20deg;
+            --caro-radius: min(36vw, 32vh); /* Radius reduced */
+            display: grid; perspective: 1000px; transform-style: preserve-3d;
+            pointer-events: auto;
         }
-        
-        .img-btn { 
-            width: 100%; 
-            flex: 1; /* All buttons take equal height */
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            cursor: pointer; 
-            background-size: cover; 
-            background-position: center;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
+        .wheel-item {
+            grid-area: 1/1; 
+            transform: rotateZ(var(--caro-tiltZ)) rotateX(var(--caro-tiltX)) rotateY(var(--item-rotateY)) translateZ(var(--caro-radius)) rotateX(15deg);
+            animation: item-rotateY var(--duration) calc(var(--duration)/var(--n)*var(--i) - var(--duration)) infinite linear;
         }
+        @keyframes item-rotateY { 100% { --item-rotateY: 360deg; } }
         
-        /* TINY MARGIN AT BOTTOM */
-        .img-btn:last-child { margin-bottom: 5px; }
+        .wheel-img { 
+            height: 112px; width: 80px; /* 20% Smaller than 140x100 */
+            object-fit: cover; border-radius: 10px; 
+            border: 2px solid rgba(255,255,255,0.1); opacity: 0.8; 
+            mask: linear-gradient(to top, rgba(0,0,0,0.05), white 40%); 
+            -webkit-mask: linear-gradient(to top, rgba(0,0,0,0.05), white 40%); 
+            transition: 0.3s;
+        }
+        .wheel-img:hover { opacity: 1; filter: brightness(1.2); transform: scale(1.1); }
 
-        .btn-label { color: white; font-size: 12px; font-weight: 900; background: rgba(0,0,0,0.6); width: 100%; text-align: center; text-transform: uppercase; }
-
-        /* --- VIDEO POPUP --- */
+        /* --- VIDEO POPUP (20% Smaller) --- */
         #video-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-            z-index: 10000; display: none; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(15px);
+            z-index: 20000; display: none; align-items: center; justify-content: center;
         }
         #video-popup {
-            position: relative; width: 85%; max-width: 450px; background: #000;
-            border: 3px solid var(--border); border-radius: 40px;
-            display: flex; flex-direction: column; overflow: hidden;
-            transform: scale(0.8); transition: 0.3s;
+            position: relative; width: 72%; max-width: 384px; /* Reduced from 90%/480px */
+            background: #000; border: 1px solid var(--border); border-radius: 32px;
+            overflow: hidden; transform: scale(0.8); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #video-overlay.active #video-popup { transform: scale(1); }
         
         .close-popup {
-            position: absolute; top: 20px; right: 20px; width: 55px; height: 55px;
-            background: #fff; border: none; color: #000; font-size: 30px;
-            cursor: pointer; border-radius: 50%; z-index: 10005;
+            position: absolute; top: 10%; right: 5%; width: 36px; height: 36px; /* Smaller button */
+            background: rgba(255, 255, 255, 0.95); border: none; color: #000; font-size: 18px;
+            cursor: pointer; border-radius: 50%; z-index: 20005; font-weight: bold;
             display: flex; align-items: center; justify-content: center;
         }
 
-        .video-bar { position: fixed; top: 0; right: 0; display: flex; z-index: 9997; height: 50px; background: rgba(0,0,0,0.5); }
-        .vid-btn { width: 110px; height: 50px; background: transparent; border: none; border-left: 1px solid var(--border); color: white; cursor: pointer; font-weight: bold; }
-        #heart-btn { position: fixed; bottom: 20px; right: 20px; font-size: 45px; cursor: pointer; z-index: 9999; }
-        #main-viewport { position: fixed; top: 50px; left: 0; width: 100%; height: calc(100% - 50px); border: none; display: none; z-index: 1; background: #000; }
+        #heart-btn { position: fixed; bottom: 24px; right: 24px; font-size: 40px; cursor: pointer; z-index: 10005; }
+        #main-viewport { position: fixed; top: 0; left: 0; width: 100%; height: 100%; border: none; display: none; z-index: 10008; background: #000; }
     </style>
 </head>
 <body>
 
-    <!-- VIDEO POPUP -->
     <div id="video-overlay" onclick="closePopup()">
         <div id="video-popup" onclick="event.stopPropagation()">
             <button class="close-popup" onclick="closePopup()">✕</button>
-            <video id="popup-video-player" playsinline><source src="" type="video/mp4"></video>
-            <div style="padding:25px; background:#111;">
+            <video id="popup-video-player" playsinline style="width:100%;"><source src="" type="video/mp4"></video>
+            <div style="padding:20px; background: #111;">
                 <input type="range" id="seekbar" value="0" step="0.1" style="width:100%; accent-color: var(--accent);">
-                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-top:8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-top:8px;">
                     <span id="current-time">0:00</span>
                     <span id="duration">0:00</span>
                 </div>
@@ -139,7 +156,6 @@
     </div>
 
     <div id="sidebar">
-        <!-- Tongue is inside the sidebar so it moves WITH the sidebar -->
         <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div>
         <div class="merged-group">
             <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div>
@@ -148,130 +164,33 @@
             <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')"><div class="btn-label">Professor</div></div>
             <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">Missing</div></div>
             <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')"><div class="btn-label">Revenge</div></div>
-            <div class="img-btn" style="border-color:red" onclick="openLocked()"><div class="btn-label" style="color:red">LOCKED</div></div>
+            <div class="img-btn" style="border: 1px solid red;" onclick="openLocked()"><div class="btn-label" style="color:red">LOCKED</div></div>
         </div>
     </div>
 
+    <section class="wheel-container">
+        <ul class="wheel-list">
+            <li class="wheel-item" style="--i:1"><img class="wheel-img" src="https://iili.io/B6lpCmX.jpg"></li>
+            <li class="wheel-item" style="--i:2"><img class="wheel-img" src="https://iili.io/B6lpzLG.jpg"></li>
+            <li class="wheel-item" style="--i:3"><img class="wheel-img" src="https://iili.io/B6lpxXs.jpg"></li>
+            <li class="wheel-item" style="--i:4"><img class="wheel-img" src="https://iili.io/B6lpoIn.jpg"></li>
+            <li class="wheel-item" style="--i:5"><img class="wheel-img" src="https://iili.io/B6lpTBf.jpg"></li>
+            <li class="wheel-item" style="--i:6"><img class="wheel-img" src="https://iili.io/B6lpArl.jpg"></li>
+            <li class="wheel-item" style="--i:7"><img class="wheel-img" src="https://iili.io/B6lp522.jpg"></li>
+            <li class="wheel-item" style="--i:8"><img class="wheel-img" src="https://iili.io/B6lp77S.jpg"></li>
+            <li class="wheel-item" style="--i:9"><img class="wheel-img" src="https://iili.io/B6lpYk7.jpg"></li>
+            <li class="wheel-item" style="--i:10"><img class="wheel-img" src="https://iili.io/B6lpap9.jpg"></li>
+        </ul>
+    </section>
+
     <iframe id="main-viewport"></iframe>
-<style>
-@charset "UTF-8";
-@import url(https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,600,700,800);
 
-/* Property registration for animation */
-@property --item-rotateY {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
-
-/* Container styling */
-.wheel-container {
-    margin-left: 5%; /* 5% margin gap for auto-hidden menu */
-    height: 120vh;
-    display: grid;
-    place-items: center;
-    background: transparent; /* Fully transparent background */
-    overflow: hidden;
-}
-
-.wheel-list {
-    --n: 10; /* Number of items */
-    --duration: 30s;
-    --caro-tiltZ: 45deg;
-    --caro-tiltX: 4deg;
-    --caro-max-radius: 58em;
-    /* Responsive radius based on screen width */
-    --caro-radius: min(35vw, var(--caro-max-radius));
-    --caro-omtrek: calc(2 * 3.141592653589793 * var(--caro-radius));
-    
-    /* Variable width calculations */
-    --item-spacing: 0.7;
-    --item-size-bruto: calc(var(--caro-omtrek) / var(--n));
-    --item-size-netto: calc(var(--item-size-bruto) / (1 + var(--item-spacing)));
-    
-    --item-tiltX: 15deg;
-    
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    display: grid;
-    perspective: 120vw;
-    transform-style: preserve-3d;
-    opacity: 1.0; /* Whole wheel opacity */
-}
-
-/* Individual Item Animation & Positioning */
-.wheel-item {
-    grid-area: 1/1;
-    width: var(--item-size-netto);
-    /* Set index variables for timing */
-    --delay: calc(var(--duration) / var(--n) * var(--i) - var(--duration));
-    
-    transform:
-        rotateZ(var(--caro-tiltZ))
-        rotateX(var(--caro-tiltX))
-        rotateY(var(--item-rotateY))
-        translateZ(var(--caro-radius))
-        rotateX(var(--item-tiltX));
-    
-    animation: item-rotateY var(--duration) var(--delay) infinite linear;
-}
-
-/* Child indices for timing */
-.wheel-item:nth-child(1) { --i:1; }
-.wheel-item:nth-child(2) { --i:2; }
-.wheel-item:nth-child(3) { --i:3; }
-.wheel-item:nth-child(4) { --i:4; }
-.wheel-item:nth-child(5) { --i:5; }
-.wheel-item:nth-child(6) { --i:6; }
-.wheel-item:nth-child(7) { --i:7; }
-.wheel-item:nth-child(8) { --i:8; }
-.wheel-item:nth-child(9) { --i:9; }
-.wheel-item:nth-child(10) { --i:10; }
-
-@keyframes item-rotateY {
-    100% { --item-rotateY: 360deg; }
-}
-
-/* Image Styling: 3D Border & Shadows */
-.wheel-img {
-    height: 120px;
-    width: 75px; /* Spans the width of the variable LI */
-    object-fit: cover;
-    display: block;
-    
-    /* 3D Border & Deep Shadows */
-    border: 4px solid #1a1a1a; /* Thick dark border */
-    border-radius: 8px;
-    box-shadow: 
-        10px 20px 30px rgba(0,0,0,0.5), 
-        -2px -2px 5px rgba(255,255,255,0.05); 
-        
-    /* Maintain the transparent fade mask */
-    mask: linear-gradient(60deg, transparent, red);
-    -webkit-mask: linear-gradient(60deg, transparent, red);
-}
-</style>
-
-<section class="wheel-container">
-    <ul class="wheel-list">
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpCmX.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpzLG.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpxXs.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpoIn.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpTBf.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpArl.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lp522.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lp77S.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpYk7.jpg" alt="" /></li>
-        <li class="wheel-item"><img class="wheel-img" src="https://iili.io/B6lpap9.jpg" alt="" /></li>
-    </ul>
-</section>
     <script>
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('video-overlay');
         const video = document.getElementById('popup-video-player');
         const seekbar = document.getElementById('seekbar');
+        const viewport = document.getElementById('main-viewport');
 
         function toggleSidebar(e) {
             e.stopPropagation();
@@ -281,21 +200,22 @@
         function playPopupVideo(src) {
             video.src = src;
             overlay.style.display = 'flex';
-            setTimeout(() => overlay.classList.add('active'), 10);
-            video.play();
+            setTimeout(() => overlay.classList.add('active'), 50);
+            video.play().catch(e => console.log("Playback error: ", e));
         }
 
         function closePopup() {
             overlay.classList.remove('active');
             video.pause();
-            setTimeout(() => overlay.style.display = 'none', 300);
+            setTimeout(() => overlay.style.display = 'none', 400);
         }
 
         video.ontimeupdate = () => {
-            const p = (video.currentTime / video.duration) * 100;
-            seekbar.value = p || 0;
-            document.getElementById('current-time').innerText = formatTime(video.currentTime);
-            document.getElementById('duration').innerText = formatTime(video.duration || 0);
+            if(!isNaN(video.duration)) {
+                seekbar.value = (video.currentTime / video.duration) * 100;
+                document.getElementById('current-time').innerText = formatTime(video.currentTime);
+                document.getElementById('duration').innerText = formatTime(video.duration);
+            }
         };
 
         seekbar.oninput = () => { video.currentTime = (seekbar.value / 100) * video.duration; };
@@ -306,8 +226,8 @@
         }
 
         function loadPage(url) {
-            const vp = document.getElementById('main-viewport');
-            vp.src = url; vp.style.display = 'block';
+            viewport.src = url;
+            viewport.style.display = 'block';
             sidebar.classList.remove('open');
         }
 
@@ -317,14 +237,20 @@
 
         function sendLikeEmail() {
             const h = document.getElementById('heart-btn');
-            h.innerText = '💖'; setTimeout(() => h.innerText = '❤️', 2000);
+            h.innerText = '💖'; 
+            setTimeout(() => { h.innerText = '❤️'; }, 2000);
         }
 
-        // Auto-close menu when clicking the screen
+        // Auto-close sidebar when clicking on the main content area
         window.onclick = (e) => {
             if (sidebar.classList.contains('open') && !sidebar.contains(e.target)) {
                 sidebar.classList.remove('open');
             }
+        };
+
+        // Prevent clicks inside the video popup from closing it via the overlay logic
+        document.getElementById('video-popup').onclick = (e) => {
+            e.stopPropagation();
         };
     </script>
 </body>
