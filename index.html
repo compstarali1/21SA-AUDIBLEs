@@ -90,7 +90,7 @@
         .wheel-list {
             --n: 15; --duration: 45s; --caro-radius: min(38vw, 38vh); 
             display: grid; perspective: 1500px; transform-style: preserve-3d;
-            pointer-events: auto; transform: rotateX(8deg);
+            pointer-events: auto; transform: rotateX(15deg);
         }
 
         @media (min-width: 900px) {
@@ -155,7 +155,7 @@
         </div> 
     </div> 
 
-    <div id="heart-btn" onclick="sendLikeEmail()">❤️</div> 
+    <div id="heart-btn" onclick="sendLikeEmail()">🤍</div> 
 
     <div class="video-bar"> 
         <button class="vid-btn" onclick="playPopupVideo('vid1.mp4')">Trailer 1</button> 
@@ -226,9 +226,20 @@
             if(prompt("ENTER PIN:") === "1111") loadPage('interactive/index.html');
         }
 
+        let isFavourite = false;
+
         function sendLikeEmail() {
-            const h = document.getElementById('heart-btn');
-            h.innerText = '💖'; setTimeout(() => h.innerText = '❤️', 1000);
+            const heart = document.getElementById('heart-btn');
+
+            isFavourite = !isFavourite;
+
+            if (isFavourite) {
+                heart.innerText = '💖';
+                heart.style.transform = 'scale(1.2)';
+            } else {
+                heart.innerText = '🤍';
+                heart.style.transform = 'scale(1)';
+            }
         }
 
         window.onclick = (e) => {
