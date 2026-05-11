@@ -11,9 +11,10 @@
             --glass: rgba(5, 5, 5, 0.95);
             --border: rgba(255, 255, 255, 0.2);
             --sidebar-width: 65vw;
-            --max-sidebar: 240px;
+            --max-sidebar: 340px;
             --glow: 0 0 20px rgba(255, 0, 85, 0.5);
             --font-main: 'Segoe UI', Roboto, sans-serif;
+            --radius: 225px; 
         }
 
         body, html {
@@ -23,174 +24,273 @@
             overflow: hidden; color: white;
         }
 
-        /* --- BACKGROUND LAYERS --- */
         #bg-canvas { position: fixed; inset: 0; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); z-index: -2; }
-        #bg-gif-overlay {
-            position: fixed; inset: 0;
-            background: url('bg4.gif') no-repeat center center;
-            background-size: cover; opacity: 0.7; z-index: -1;
-        }
+        #bg-gif-overlay { position: fixed; inset: 0; background: url('bg4.gif') no-repeat center center; background-size: cover; opacity: 0.7; z-index: -1; }
 
-        /* --- TOP VIDEO BAR --- */
         .video-bar { position: fixed; top: 25px; right: 5px; display: flex; gap: 25px; z-index: 10005; }
-        .vid-btn { 
-            padding: 10px 18px; background: var(--glass); backdrop-filter: blur(15px);
-            border: 2px solid var(--border); border-radius: 30px; color: white; 
-            cursor: pointer; font-weight: 800; transition: 0.6s;
-            text-transform: uppercase; font-size: 11px; letter-spacing: 1px;
-        }
+        .vid-btn { padding: 10px 18px; background: var(--glass); backdrop-filter: blur(15px); border: 2px solid var(--border); border-radius: 30px; color: white; cursor: pointer; font-weight: 800; transition: 0.6s; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
         .vid-btn:hover { background: var(--accent); transform: scale(1.1); box-shadow: var(--glow); }
 
-        /* --- SIDEBAR --- */
-        #sidebar { 
-            position: fixed; left: 0; top: 0; height: 100%; 
-            width: var(--sidebar-width); max-width: var(--max-sidebar);
-            background: var(--glass); backdrop-filter: blur(40px); 
-            border-right: 3px solid var(--accent); z-index: 100000;
-            box-shadow: 25px 0 60px rgba(0,0,0,1);
-            transform: translateX(calc(-100% + 5px)); 
-            transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+        /* --- AUTO PLAY BUTTON --- */
+        #autoplay-btn {
+            position: fixed; bottom: 30px; right: 30px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 10006;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 10px 20px 30px rgba(0,0,0,0.5);
         }
+        #autoplay-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-5px); }
+        #autoplay-btn.active {
+            background: var(--accent);
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.6), 0 0 20px var(--accent);
+            transform: translateY(2px) scale(0.95);
+            border-color: transparent;
+        }
+
+        /* --- COUNTDOWN TIMER --- */
+        #countdown-timer {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 20px var(--accent), 0 0 40px rgba(255, 255, 255, 0.4);
+            z-index: 15;
+            display: none;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width); max-width: var(--max-sidebar); background: var(--glass); backdrop-filter: blur(40px); border-right: 2px solid var(--accent); z-index: 100000; box-shadow: 25px 0 60px rgba(0,0,0,1); transform: translateX(calc(-100% + 5px)); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); }
         #sidebar.open { transform: translateX(0); }
-        #menu-tongue { 
-            position: absolute; right: -55px; top: 50%; transform: translateY(-50%); 
-            width: 55px; height: 140px; background: #000; border: 2px solid var(--accent);
-            border-left: none; clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100001;
-        }
+        #menu-tongue { position: absolute; right: -40px; top: 20%; transform: translateY(-50%); width: 55px; height: 140px; background: #000; border: 2px solid var(--accent); border-left: none; clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100001; }
         #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: #fff; text-shadow: 0 0 10px var(--accent); font-size: 14px; letter-spacing: 4px; }
         .merged-group { display: flex; flex-direction: column; height: 100%; padding: 25px 15px; box-sizing: border-box; gap: 10px; }
         .img-btn { width: 100%; flex: 1; border: 3px solid var(--border); border-radius: 6px; cursor: pointer; background-size: cover; background-position: center; display: flex; align-items: flex-end; transition: 0.8s; overflow: hidden; }
-        .btn-label { color: rgba(255,255,255,0.7); font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.15); width: 100%; text-align: center; padding: 8px 0; text-transform: uppercase; backdrop-filter: blur(2px); }
+        .btn-label { color: rgba(255,255,255,0.7); font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.15); width: 100%; text-align: center; padding: 8px 0; text-transform: uppercase; backdrop-filter: blur(10px); }
 
-        /* --- VIEWPORT & MODALS --- */
+        #carousel-container { 
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            background: transparent; 
+            overflow: hidden; 
+            touch-action: none; 
+            z-index: 1; 
+            top: 40%; /* Carousel moved to 40% from top */
+            transform: translateY(-50%);
+        }
+        .progress-wrapper-snip { position: absolute; top: 200px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
+        .progress-container-snip { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; overflow: hidden; }
+        .progress-bar-snip { width: 8.88%; height: 100%; background: linear-gradient(90deg, #00d2ff, #9d50bb); transition: width 0.5s ease-out; }
+        
+        .scene-snip { width: 84px; height: 84px; perspective: 1000px; }
+        .cube-snip { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-15deg); transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 2); }
+        .face-snip { 
+            position: absolute; width: 84px; height: 84px; border: 2px solid rgba(255,255,255,0.3); 
+            background-color: rgba(255,255,255,0.1); background-size: cover; background-position: center; 
+            border-radius: 6px; backface-visibility: visible;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s;
+            filter: brightness(0.7);
+        }
+        .face-snip.active { filter: brightness(1.2); z-index: 10; }
+
+        .helper-snip { position: absolute; bottom: 100px; text-align: center; color: white; width: 100%; }
+        .arrow-snip { display: inline-block; font-size: 24px; margin: 0 20px; opacity: 0.3; }
+
         #main-viewport { position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; display: none; z-index: 5000; background: #000; }
         #video-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); backdrop-filter: blur(25px); z-index: 110000; display: none; align-items: center; justify-content: center; padding-top: 60px; }
         #video-popup { width: 95%; max-width: 600px; border: 2px solid var(--accent); border-radius: 12px; background: #000; overflow: hidden; position: relative; }
-        .close-popup { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: rgba(255, 0, 85, 0.9); border: none; color: white; border-radius: 50%; cursor: pointer; z-index: 110005; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        #heart-btn { position: fixed; bottom: 25px; right: 25px; font-size: 45px; cursor: pointer; z-index: 100005; }
-    </style> 
-</head> 
-<body> 
+        .close-popup { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: var(--accent); border: none; color: white; border-radius: 50%; cursor: pointer; z-index: 110005; font-weight: bold; }
+    </style>
+</head>
+<body>
     <div id="bg-canvas"></div>
     <div id="bg-gif-overlay"></div>
 
-    <!-- 3D 17-Face Carousel Snippet Start -->
-    <div id="carousel-container" style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; overflow: hidden; font-family: sans-serif; touch-action: none; z-index: 1;">
-        <style>
-            .progress-wrapper-snip { position: absolute; top: 90px; width: 220px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
-            .progress-container-snip { width: 100%; height: 4px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; overflow: hidden; }
-            .progress-bar-snip { width: 5.88%; height: 100%; background: linear-gradient(90deg, #00d2ff, #9d50bb); box-shadow: 0 0 10px rgba(0, 210, 255, 0.5); transition: width 0.5s ease-out; }
-            .scene-snip { width: 140px; height: 140px; perspective: 800px; }
-            .cube-snip { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-15deg); transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1); }
-            .face-snip { position: absolute; width: 140px; height: 140px; border: 1px solid rgba(255,255,255,0.3); background-color: rgba(255,255,255,0.1); background-size: cover; background-position: center; backface-visibility: visible; border-radius: 6px; }
-            .f1  { transform: rotateY(calc(21.176deg * 0))  translateZ(375px); background-image: url('song/1.gif'); }
-            .f2  { transform: rotateY(calc(21.176deg * 1))  translateZ(375px); background-image: url('song/2.gif'); }
-            .f3  { transform: rotateY(calc(21.176deg * 2))  translateZ(375px); background-image: url('song/3.gif'); }
-            .f4  { transform: rotateY(calc(21.176deg * 3))  translateZ(375px); background-image: url('song/4.gif'); }
-            .f5  { transform: rotateY(calc(21.176deg * 4))  translateZ(375px); background-image: url('song/5.gif'); }
-            .f6  { transform: rotateY(calc(21.176deg * 5))  translateZ(375px); background-image: url('song/6.gif'); }
-            .f7  { transform: rotateY(calc(21.176deg * 6))  translateZ(375px); background-image: url('song/7.gif'); }
-            .f8  { transform: rotateY(calc(21.176deg * 7))  translateZ(375px); background-image: url('song/8.gif'); }
-            .f9  { transform: rotateY(calc(21.176deg * 8))  translateZ(375px); background-image: url('song/9.jpg'); }
-            .f10 { transform: rotateY(calc(21.176deg * 9))  translateZ(375px); background-image: url('song/10.jpg'); }
-            .f11 { transform: rotateY(calc(21.176deg * 10)) translateZ(375px); background-image: url('song/11.jpg'); }
-            .f12 { transform: rotateY(calc(21.176deg * 11)) translateZ(375px); background-image: url('song/12.jpg'); }
-            .f13 { transform: rotateY(calc(21.176deg * 12)) translateZ(375px); background-image: url('song/13.jpg'); }
-            .f14 { transform: rotateY(calc(21.176deg * 13)) translateZ(375px); background-image: url('song/14.jpg'); }
-            .f15 { transform: rotateY(calc(21.176deg * 14)) translateZ(375px); background-image: url('song/15.gif'); }
-            .f16 { transform: rotateY(calc(21.176deg * 15)) translateZ(375px); background-image: url('song/16.gif'); }
-            .f17 { transform: rotateY(calc(21.176deg * 16)) translateZ(375px); background-image: url('song/17.gif'); }
-            .helper-snip { position: absolute; bottom: 40px; text-align: center; color: white; width: 100%; }
-            .arrow-snip { display: inline-block; font-size: 24px; margin: 0 20px; opacity: 0.3; }
-        </style>
+    <!-- COUNTDOWN TIMER ELEMENT -->
+    <div id="countdown-timer">10</div>
+
+    <div id="carousel-container">
         <div class="progress-wrapper-snip">
             <div style="color: white; font-size: 12px; letter-spacing: 2px;">FACE <span id="snip-faceNum">1</span> / 17</div>
             <div class="progress-container-snip"><div class="progress-bar-snip" id="snip-progressBar"></div></div>
         </div>
         <div class="scene-snip">
-            <div class="cube-snip" id="snip-cube">
-                <div class="face-snip f1"></div><div class="face-snip f2"></div><div class="face-snip f3"></div><div class="face-snip f4"></div><div class="face-snip f5"></div><div class="face-snip f6"></div><div class="face-snip f7"></div><div class="face-snip f8"></div><div class="face-snip f9"></div><div class="face-snip f10"></div><div class="face-snip f11"></div><div class="face-snip f12"></div><div class="face-snip f13"></div><div class="face-snip f14"></div><div class="face-snip f15"></div><div class="face-snip f16"></div><div class="face-snip f17"></div>
-            </div>
+            <div class="cube-snip" id="snip-cube"></div>
         </div>
-        <div class="helper-snip"><span class="arrow-snip">◀</span><span style="font-size: 10px; opacity: 0.4; text-transform: uppercase;">Swipe Wheel</span><span class="arrow-snip">▶</span></div>
+        <div class="helper-snip"><span class="arrow-snip">◀</span><span style="font-size: 25px; opacity: 0.8;">Swipe Wheel</span><span class="arrow-snip">▶</span></div>
     </div>
 
-    <div id="video-overlay" onclick="closePopup()"> 
-        <div id="video-popup" onclick="event.stopPropagation()"> 
-            <button class="close-popup" onclick="closePopup()">✕</button> 
-            <video id="popup-video-player" playsinline style="width:100%; display:block;"></video> 
-        </div> 
-    </div> 
+    <!-- PLAYLIST TOGGLE -->
+    <button id="autoplay-btn" onclick="toggleAutoplay()">Sample 10s internal</button>
 
-    <div class="video-bar"> 
-        <button class="vid-btn" onclick="playPopupVideo('trailer1.mp4')">Ebook 1</button> 
-        <button class="vid-btn" onclick="playPopupVideo('vid2.mp4')">Trailer 2</button> 
-        <button class="vid-btn" onclick="playPopupVideo('vid3.mp4')">Ebooks</button> 
-    </div> 
+    <div id="video-overlay" onclick="closePopup()">
+        <div id="video-popup" onclick="event.stopPropagation()">
+            <button class="close-popup" onclick="closePopup()">✕</button>
+            <video id="popup-video-player" playsinline style="width:100%; display:block;"></video>
+        </div>
+    </div>
 
-    <div id="sidebar"> 
-        <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div> 
-        <div class="merged-group"> 
-            <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div> 
-            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('song/index.html')"><div class="btn-label">Song</div></div> 
-            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('willy/index.html')"><div class="btn-label">Willy</div></div> 
-            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')"><div class="btn-label">Professor</div></div> 
-            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">Missing</div></div> 
-            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')"><div class="btn-label">Revenge</div></div> 
-            <div class="img-btn" style="background-image: url('7.jpg'); border: 3px solid red;" onclick="openLocked()"><div class="btn-label" style="color:#ff3333;">LOCKED</div></div> 
-        </div> 
-    </div> 
+    <div class="video-bar">
+        <button class="vid-btn" onclick="playPopupVideo('trailer1.mp4')">Ebook 1</button>
+        <button class="vid-btn" onclick="playPopupVideo('vid2.mp4')">Trailer 2</button>
+        <button class="vid-btn" onclick="playPopupVideo('vid3.mp4')">Ebooks</button>
+    </div>
 
-    <iframe id="main-viewport"></iframe> 
+    <div id="sidebar">
+        <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div>
+        <div class="merged-group">
+            <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div>
+            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('song/index.html')"><div class="btn-label">Song</div></div>
+            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('willy/index.html')"><div class="btn-label">Willy</div></div>
+            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')"><div class="btn-label">Professor</div></div>
+            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">Missing</div></div>
+            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')"><div class="btn-label">Revenge</div></div>
+            <div class="img-btn" style="background-image: url('7.jpg'); border: 3px solid red;" onclick="openLocked()"><div class="btn-label" style="color:#ff3333;">LOCKED</div></div>
+        </div>
+    </div>
+
+    <iframe id="main-viewport"></iframe>
 
     <script>
-        // --- Global Config ---
         const totalFaces = 17;
         const angleStep = 360 / totalFaces;
         let currentStep = 0;
         let startX = 0;
+        let autoplayTimer = null;
+        let countdownInterval = null;
+        const INTERVAL_TIME = 10000; // 10 seconds
 
-        // --- Audio Logic for song/1.mp3 to song/17.mp3 ---
-        const audios = Array.from({ length: totalFaces }, (_, i) => new Audio(`song/${i + 1}.mp3`));
+        // --- GLOBAL SINGLE AUDIO PLAYER ---
+        // This solves the "Next song" block issue
+        const globalPlayer = new Audio();
+        globalPlayer.preload = "auto";
 
-        function playFaceAudio(index) {
-            audios.forEach(a => { a.pause(); a.currentTime = 0; });
-            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
-            if(audios[normalized]) audios[normalized].play().catch(() => {});
-        }
+        const media = [
+            'song/1.gif', 'song/2.gif', 'song/3.gif', 'song/4.gif', 'song/5.gif', 'song/6.gif', 'song/7.gif', 'song/8.gif', 
+            'song/9.jpg', 'song/10.jpg', 'song/11.jpg', 'song/12.jpg', 'song/13.jpg', 'song/14.jpg', 'song/15.gif', 
+            'song/16.gif', 'song/17.gif'
+        ];
 
-        // --- Carousel Logic ---
         const cube = document.getElementById('snip-cube');
         const pBar = document.getElementById('snip-progressBar');
         const fNum = document.getElementById('snip-faceNum');
+        const countdownEl = document.getElementById('countdown-timer');
+
+        media.forEach((url, i) => {
+            const div = document.createElement('div');
+            div.className = `face-snip f${i+1}`;
+            div.style.backgroundImage = `url('${url}')`;
+            cube.appendChild(div);
+        });
+
+        const faces = document.querySelectorAll('.face-snip');
 
         function updateUI(index) {
             let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
             pBar.style.width = `${((normalized + 1) / totalFaces) * 100}%`;
             fNum.innerText = normalized + 1;
+
+            faces.forEach((face, i) => {
+                const angle = i * angleStep;
+                const isFront = (i === normalized);
+                const scale =isFront ? 1.5 : 1.0; 
+                face.style.transform = `rotateY(${angle}deg) translateZ(355px) scale(${scale})`;
+                face.classList.toggle('active', isFront);
+            });
         }
 
         function rotate(dir) {
             dir === 'left' ? currentStep++ : currentStep--;
-            cube.style.transform = `rotateX(-15deg) rotateY(${currentStep * -angleStep}deg)`;
+            cube.style.transform = `rotateX(-10deg) rotateY(${currentStep * -angleStep}deg)`;
             updateUI(currentStep);
             playFaceAudio(currentStep);
         }
 
+        function playFaceAudio(index) {
+            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
+            const songPath = `song/${normalized + 1}.mp3`;
+            globalPlayer.src = songPath;
+            globalPlayer.play().catch(e => console.log("Audio play blocked:", e));
+        }
+
+        function startCountdown() {
+            let timeLeft = 8;
+            countdownEl.innerText = timeLeft;
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft < 0) timeLeft = 10;
+                countdownEl.innerText = timeLeft;
+            }, 1000);
+        }
+
+        function toggleAutoplay() {
+            const btn = document.getElementById('autoplay-btn');
+            
+            if (autoplayTimer) {
+                // STOP
+                clearInterval(autoplayTimer);
+                clearInterval(countdownInterval);
+                autoplayTimer = null;
+                countdownInterval = null;
+                btn.classList.remove('active');
+                countdownEl.style.display = 'none';
+                globalPlayer.pause();
+            } else {
+                // START
+                btn.classList.add('active');
+                countdownEl.style.display = 'block';
+                
+                // Rotate immediately
+                rotate('left');
+                startCountdown();
+                
+                // Set the loop
+                autoplayTimer = setInterval(() => {
+                    rotate('left');
+                    startCountdown(); // Reset visual counter on every turn
+                }, 10000);
+            }
+        }
+
         const container = document.getElementById('carousel-container');
-        container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+        container.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+            if (autoplayTimer) toggleAutoplay(); 
+        });
         container.addEventListener('touchend', e => {
             let diff = startX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 40) rotate(diff > 0 ? 'left' : 'right');
+            if (Math.abs(diff) > 50) rotate(diff > 0 ? 'left' : 'right');
         });
-        container.addEventListener('mousedown', e => { startX = e.clientX; });
+        container.addEventListener('mousedown', e => {
+            startX = e.clientX;
+            if (autoplayTimer) toggleAutoplay();
+        });
         container.addEventListener('mouseup', e => {
             let diff = startX - e.clientX;
             if (Math.abs(diff) > 40) rotate(diff > 0 ? 'left' : 'right');
         });
 
-        // --- UI & Sidebar Navigation ---
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('video-overlay');
         const video = document.getElementById('popup-video-player');
@@ -199,13 +299,7 @@
         function toggleSidebar(e) { e.stopPropagation(); sidebar.classList.toggle('open'); }
         function playPopupVideo(src) { video.src = src; overlay.style.display = 'flex'; video.play(); }
         function closePopup() { video.pause(); overlay.style.display = 'none'; }
-        
-        function loadPage(url) { 
-            viewport.src = url; 
-            viewport.style.display = 'block'; 
-            sidebar.classList.remove('open'); 
-        }
-
+        function loadPage(url) { viewport.src = url; viewport.style.display = 'block'; sidebar.classList.remove('open'); }
         function openLocked() { if(prompt("ENTER PIN:") === "1111") loadPage('interactive/index.html'); }
 
         window.onclick = (e) => {
@@ -218,8 +312,7 @@
             if (e.key === "Escape") { viewport.style.display = 'none'; viewport.src = ""; closePopup(); }
         });
 
-        // Initialize UI
         updateUI(0);
-    </script> 
+    </script>
 </body>
 </html>
