@@ -233,13 +233,13 @@
         }
 
         function startCountdown() {
-            let timeLeft = 10;
+            let timeLeft = 9;
             countdownEl.innerText = timeLeft;
             if (countdownInterval) clearInterval(countdownInterval);
             
             countdownInterval = setInterval(() => {
                 timeLeft--;
-                if (timeLeft < 0) timeLeft = 10;
+                if (timeLeft < 0) timeLeft = 9;
                 countdownEl.innerText = timeLeft;
             }, 1000);
         }
@@ -269,7 +269,7 @@
                 autoplayTimer = setInterval(() => {
                     rotate('left');
                     startCountdown(); // Reset visual counter on every turn
-                }, 10000);
+                }, 9000);
             }
         }
 
