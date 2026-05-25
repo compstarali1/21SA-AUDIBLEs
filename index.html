@@ -59,16 +59,12 @@
 
         /* --- COUNTDOWN TIMER --- */
         #countdown-timer {
-            position: absolute;
-            top: 40%;
-            left: 50%;
+            position: absolute; top: 40%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 80px;
-            font-weight: 900;
+            font-size: 80px; font-weight: 900;
             color: #ffffff;
             text-shadow: 0 0 20px var(--accent), 0 0 40px rgba(255, 255, 255, 0.4);
-            z-index: 15;
-            display: none;
+            z-index: 15; display: none;
             pointer-events: none;
             transition: all 0.5s ease;
         }
@@ -82,20 +78,10 @@
         .btn-label { color: rgba(255,255,255,0.7); font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.15); width: 100%; text-align: center; padding: 8px 0; text-transform: uppercase; backdrop-filter: blur(10px); }
 
         #carousel-container { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background: transparent; 
-            overflow: hidden; 
-            touch-action: none; 
-            z-index: 1; 
-            top: 40%; /* Carousel moved to 40% from top */
-            transform: translateY(-50%);
+            position: absolute; inset: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            background: transparent; overflow: hidden; touch-action: none; z-index: 1; 
+            top: 40%; transform: translateY(-50%);
         }
         .progress-wrapper-snip { position: absolute; top: 200px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
         .progress-container-snip { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; overflow: hidden; }
@@ -136,7 +122,7 @@
         <div class="scene-snip">
             <div class="cube-snip" id="snip-cube"></div>
         </div>
-        <div class="helper-snip"><span class="arrow-snip">◀</span><span style="font-size: 25px; opacity: 0.8;">Swipe Wheel</span><span class="arrow-snip">▶</span></div>
+        <div class="helper-snip"><span class="arrow-snip">◀</span><span style="font-size: 35px; opacity: 0.7;">Swipe Wheel</span><span class="arrow-snip">▶</span></div>
     </div>
 
     <!-- PLAYLIST TOGGLE -->
@@ -158,12 +144,16 @@
     <div id="sidebar">
         <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div>
         <div class="merged-group">
+            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('https://shorturl.at/2J28a')"><div class="btn-label">PROFESSOR</div></div>
+            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('https://shorturl.at/f1OOR')"><div class="btn-label">REVENGE</div></div>
+            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('https://shorturl.at/FW28C')"><div class="btn-label">WET-WILLY</div></div>
+            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">MISSING YOU</div></div>
+            
+            <!-- ✅ NEW ORDER: Share → Custom → LOCKED -->
             <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div>
-            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('song/index.html')"><div class="btn-label">Song</div></div>
-            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('willy/index.html')"><div class="btn-label">Willy</div></div>
-            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('professor/index.html')"><div class="btn-label">Professor</div></div>
-            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">Missing</div></div>
-            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('new/index.html')"><div class="btn-label">Revenge</div></div>
+            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('custom/index.html')"><div class="btn-label">Custom</div></div>
+
+            <!-- 7th button remains exactly as before -->
             <div class="img-btn" style="background-image: url('7.jpg'); border: 3px solid red;" onclick="openLocked()"><div class="btn-label" style="color:#ff3333;">LOCKED</div></div>
         </div>
     </div>
@@ -212,7 +202,7 @@
             faces.forEach((face, i) => {
                 const angle = i * angleStep;
                 const isFront = (i === normalized);
-                const scale =isFront ? 1.5 : 1.0; 
+                const scale =isFront ? 1.5: 1.0; 
                 face.style.transform = `rotateY(${angle}deg) translateZ(355px) scale(${scale})`;
                 face.classList.toggle('active', isFront);
             });
@@ -220,7 +210,7 @@
 
         function rotate(dir) {
             dir === 'left' ? currentStep++ : currentStep--;
-            cube.style.transform = `rotateX(-10deg) rotateY(${currentStep * -angleStep}deg)`;
+            cube.style.transform = `rotateX(-25deg) rotateY(${currentStep * -angleStep}deg)`;
             updateUI(currentStep);
             playFaceAudio(currentStep);
         }
