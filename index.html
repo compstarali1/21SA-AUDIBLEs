@@ -94,7 +94,7 @@
             overflow: hidden; 
             touch-action: none; 
             z-index: 1; 
-            top: 40%; /* Carousel moved to 40% from top */
+            top: 40%;
             transform: translateY(-40%);
         }
         .progress-wrapper-snip { position: absolute; top: 200px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
@@ -120,7 +120,7 @@
         #video-popup { width: 95%; max-width: 600px; border: 2px solid var(--accent); border-radius: 12px; background: #000; overflow: hidden; position: relative; }
         .close-popup { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: var(--accent); border: none; color: white; border-radius: 50%; cursor: pointer; z-index: 110005; font-weight: bold; }
 
-        /* === COUNTER STYLES === */
+        /* === COUNTER STYLES - STABLE VERSION === */
         .counter-box {
             position: fixed;
             top: 10px;
@@ -136,27 +136,17 @@
             vertical-align: middle;
             height: 22px;
             width: auto;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- ✅✅✅ FIXED WORKING OPENED COUNTER ✅✅✅ -->
+    <!-- ✅✅✅ STABLE WORKING COUNTER - NO LOOP ✅✅✅ -->
     <div class="counter-box">
-        <img id="openCounter" class="counter-img" alt="Opened Count">
+        <img class="counter-img" alt="Opened Count"
+        src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fcompstarali1.github.io%2F21SA-AUDIBLEs%2F&count_bg=%232ea043&title_bg=%2324292f&title=Opened&edge_flat=false">
     </div>
-    <script>
-        // YOUR EXACT REPO URL - DO NOT CHANGE THIS
-        const YOUR_URL = "https://compstarali1.github.io/21SA-AUDIBLEs/";
-        // ADD UNIQUE TIME STAMP → BYPASSES CACHE = COUNTS EVERY OPEN 🔥
-        const COUNTER_LINK = `https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=${encodeURIComponent(YOUR_URL)}&count_bg=%232ea043&title_bg=%2324292f&title=Opened&edge_flat=false&t=${Date.now()}`;
-        document.getElementById("openCounter").src = COUNTER_LINK;
-
-        // IF FAILS → FALLBACK TO PINK VERSION 🩷
-        document.getElementById("openCounter").onerror = function() {
-            this.src = `https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=${encodeURIComponent(YOUR_URL)}&count_bg=%23ff0055&title_bg=%2324292f&title=Opened&edge_flat=false&r=${Math.random()}`;
-        };
-    </script>
     <!-- ========================================== -->
 
 
@@ -218,7 +208,6 @@
         const INTERVAL_TIME = 10000; // 10 seconds
 
         // --- GLOBAL SINGLE AUDIO PLAYER ---
-        // This solves the "Next song" block issue
         const globalPlayer = new Audio();
         globalPlayer.preload = "auto";
 
@@ -306,7 +295,7 @@
                 // Set the loop
                 autoplayTimer = setInterval(() => {
                     rotate('left');
-                    startCountdown(); // Reset visual counter on every turn
+                    startCountdown();
                 }, 9000);
             }
         }
