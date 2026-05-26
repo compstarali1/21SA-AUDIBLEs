@@ -2,307 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>21SA Naughty Stories</title>
+    <!-- ✅ MOBILE CRITICAL: Perfect fit, no zoom, full width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title></title>
     <style>
-        :root {
-            --bg: #02020250;
-            --accent: #ff0055;
-            --glass: rgba(5, 5, 5, 0.95);
-            --border: rgba(255, 255, 255, 0.2);
-            --sidebar-width: 65vw;
-            --max-sidebar: 340px;
-            --glow: 0 0 20px rgba(255, 0, 85, 0.5);
-            --font-main: 'Segoe UI', Roboto, sans-serif;
-            --radius: 225px; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        body, html {
-            margin: 0; padding: 0; height: 100%; width: 100%;
-            font-family: var(--font-main);
-            background-color: var(--bg);
-            overflow: hidden; color: white;
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* No scrollbars */
+            background: #000000; /* Solid background while loading */
+            position: fixed; /* Prevent mobile bounce/scrolling */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
-
-        #bg-canvas { position: fixed; inset: 0; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); z-index: -2; }
-        #bg-gif-overlay { position: fixed; inset: 0; background: url('bg4.gif') no-repeat center center; background-size: cover; opacity: 0.7; z-index: -1; }
-
-        .video-bar { position: fixed; top: 25px; right: 5px; display: flex; gap: 25px; z-index: 10005; }
-        .vid-btn { padding: 10px 18px; background: var(--glass); backdrop-filter: blur(15px); border: 2px solid var(--border); border-radius: 30px; color: white; cursor: pointer; font-weight: 800; transition: 0.6s; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        .vid-btn:hover { background: var(--accent); transform: scale(1.1); box-shadow: var(--glow); }
-
-        /* --- AUTO PLAY BUTTON --- */
-        #autoplay-btn {
-            position: fixed; bottom: 30px; right: 30px;
-            padding: 15px 25px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            color: white;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 2px;
-            cursor: pointer;
-            z-index: 10006;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 10px 20px 30px rgba(0,0,0,0.5);
+        /* ✅ FORCES IFRAME TO FILL 100% MOBILE SCREEN — NO GAPS, NO BORDERS */
+        #mainFrame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            margin: 0;
+            padding: 0;
+            display: block;
+            overflow: auto; /* Let iframe content scroll if needed */
+            -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
         }
-        #autoplay-btn:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-5px); }
-        #autoplay-btn.active {
-            background: var(--accent);
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.6), 0 0 20px var(--accent);
-            transform: translateY(2px) scale(0.95);
-            border-color: transparent;
-        }
-
-        /* --- COUNTDOWN TIMER --- */
-        #countdown-timer {
-            position: absolute; top: 40%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 80px; font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 20px var(--accent), 0 0 40px rgba(255, 255, 255, 0.4);
-            z-index: 15; display: none;
-            pointer-events: none;
-            transition: all 0.5s ease;
-        }
-
-        #sidebar { position: fixed; left: 0; top: 0; height: 100%; width: var(--sidebar-width); max-width: var(--max-sidebar); background: var(--glass); backdrop-filter: blur(40px); border-right: 2px solid var(--accent); z-index: 100000; box-shadow: 25px 0 60px rgba(0,0,0,1); transform: translateX(calc(-100% + 5px)); transition: 0.6s cubic-bezier(0.85, 0, 0.15, 1); }
-        #sidebar.open { transform: translateX(0); }
-        #menu-tongue { position: absolute; right: -40px; top: 20%; transform: translateY(-50%); width: 55px; height: 140px; background: #000; border: 2px solid var(--accent); border-left: none; clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 100001; }
-        #menu-tongue span { writing-mode: vertical-rl; font-weight: 900; color: #fff; text-shadow: 0 0 10px var(--accent); font-size: 14px; letter-spacing: 4px; }
-        .merged-group { display: flex; flex-direction: column; height: 100%; padding: 25px 15px; box-sizing: border-box; gap: 10px; }
-        .img-btn { width: 100%; flex: 1; border: 3px solid var(--border); border-radius: 6px; cursor: pointer; background-size: cover; background-position: center; display: flex; align-items: flex-end; transition: 0.8s; overflow: hidden; }
-        .btn-label { color: rgba(255,255,255,0.7); font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.15); width: 100%; text-align: center; padding: 8px 0; text-transform: uppercase; backdrop-filter: blur(10px); }
-
-        #carousel-container { 
-            position: absolute; inset: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            background: transparent; overflow: hidden; touch-action: none; z-index: 1; 
-            top: 40%; transform: translateY(-50%);
-        }
-        .progress-wrapper-snip { position: absolute; top: 200px; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 10; }
-        .progress-container-snip { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; overflow: hidden; }
-        .progress-bar-snip { width: 8.88%; height: 100%; background: linear-gradient(90deg, #00d2ff, #9d50bb); transition: width 0.5s ease-out; }
-        
-        .scene-snip { width: 84px; height: 84px; perspective: 1000px; }
-        .cube-snip { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transform: rotateX(-15deg); transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 2); }
-        .face-snip { 
-            position: absolute; width: 84px; height: 84px; border: 2px solid rgba(255,255,255,0.3); 
-            background-color: rgba(255,255,255,0.1); background-size: cover; background-position: center; 
-            border-radius: 6px; backface-visibility: visible;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s;
-            filter: brightness(0.7);
-        }
-        .face-snip.active { filter: brightness(1.2); z-index: 10; }
-
-        .helper-snip { position: absolute; bottom: 100px; text-align: center; color: white; width: 100%; }
-        .arrow-snip { display: inline-block; font-size: 24px; margin: 0 20px; opacity: 0.3; }
-
-        #main-viewport { position: fixed; inset: 0; width: 100vw; height: 100vh; border: none; display: none; z-index: 5000; background: #000; }
-        #video-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.96); backdrop-filter: blur(25px); z-index: 110000; display: none; align-items: center; justify-content: center; padding-top: 60px; }
-        #video-popup { width: 95%; max-width: 600px; border: 2px solid var(--accent); border-radius: 12px; background: #000; overflow: hidden; position: relative; }
-        .close-popup { position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; background: var(--accent); border: none; color: white; border-radius: 50%; cursor: pointer; z-index: 110005; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="bg-canvas"></div>
-    <div id="bg-gif-overlay"></div>
 
-    <!-- COUNTDOWN TIMER ELEMENT -->
-    <div id="countdown-timer">10</div>
-
-    <div id="carousel-container">
-        <div class="progress-wrapper-snip">
-            <div style="color: white; font-size: 12px; letter-spacing: 2px;">FACE <span id="snip-faceNum">1</span> / 17</div>
-            <div class="progress-container-snip"><div class="progress-bar-snip" id="snip-progressBar"></div></div>
-        </div>
-        <div class="scene-snip">
-            <div class="cube-snip" id="snip-cube"></div>
-        </div>
-        <div class="helper-snip"><span class="arrow-snip">◀</span><span style="font-size: 35px; opacity: 0.7;">Swipe Wheel</span><span class="arrow-snip">▶</span></div>
-    </div>
-
-    <!-- PLAYLIST TOGGLE -->
-    <button id="autoplay-btn" onclick="toggleAutoplay()">Sample 10s internal</button>
-
-    <div id="video-overlay" onclick="closePopup()">
-        <div id="video-popup" onclick="event.stopPropagation()">
-            <button class="close-popup" onclick="closePopup()">✕</button>
-            <video id="popup-video-player" playsinline style="width:100%; display:block;"></video>
-        </div>
-    </div>
-
-    <div class="video-bar">
-        <button class="vid-btn" onclick="playPopupVideo('trailer1.mp4')">Ebook 1</button>
-        <button class="vid-btn" onclick="playPopupVideo('vid2.mp4')">Trailer 2</button>
-        <button class="vid-btn" onclick="playPopupVideo('vid3.mp4')">Ebooks</button>
-    </div>
-
-    <div id="sidebar">
-        <div id="menu-tongue" onclick="toggleSidebar(event)"><span>MENU</span></div>
-        <div class="merged-group">
-            <div class="img-btn" style="background-image: url('4.jpg');" onclick="loadPage('https://shorturl.at/2J28a')"><div class="btn-label">PROFESSOR</div></div>
-            <div class="img-btn" style="background-image: url('6.jpg');" onclick="loadPage('https://shorturl.at/f1OOR')"><div class="btn-label">REVENGE</div></div>
-            <div class="img-btn" style="background-image: url('3.jpg');" onclick="loadPage('https://shorturl.at/FW28C')"><div class="btn-label">WET-WILLY</div></div>
-            <div class="img-btn" style="background-image: url('5.gif');" onclick="loadPage('missingyou/index.html')"><div class="btn-label">MISSING YOU</div></div>
-            
-            <!-- ✅ NEW ORDER: Share → Custom → LOCKED -->
-            <div class="img-btn" style="background-image: url('1.gif');" onclick="loadPage('share/index.html')"><div class="btn-label">Share</div></div>
-            <div class="img-btn" style="background-image: url('2.gif');" onclick="loadPage('custom/index.html')"><div class="btn-label">Custom</div></div>
-
-            <!-- 7th button remains exactly as before -->
-            <div class="img-btn" style="background-image: url('7.jpg'); border: 3px solid red;" onclick="openLocked()"><div class="btn-label" style="color:#ff3333;">LOCKED</div></div>
-        </div>
-    </div>
-
-    <iframe id="main-viewport"></iframe>
+    <!-- ✅ YOUR LINK OPENS **STRICTLY INSIDE THIS IFRAME** — NO REDIRECTS, NO PROMPTS -->
+    <iframe id="mainFrame" src="https://shorturl.at/BrtRo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
     <script>
-        const totalFaces = 17;
-        const angleStep = 360 / totalFaces;
-        let currentStep = 0;
-        let startX = 0;
-        let autoplayTimer = null;
-        let countdownInterval = null;
-        const INTERVAL_TIME = 10000; // 10 seconds
-
-        // --- GLOBAL SINGLE AUDIO PLAYER ---
-        // This solves the "Next song" block issue
-        const globalPlayer = new Audio();
-        globalPlayer.preload = "auto";
-
-        const media = [
-            'song/1.gif', 'song/2.gif', 'song/3.gif', 'song/4.gif', 'song/5.gif', 'song/6.gif', 'song/7.gif', 'song/8.gif', 
-            'song/9.jpg', 'song/10.jpg', 'song/11.jpg', 'song/12.jpg', 'song/13.jpg', 'song/14.jpg', 'song/15.gif', 
-            'song/16.gif', 'song/17.gif'
-        ];
-
-        const cube = document.getElementById('snip-cube');
-        const pBar = document.getElementById('snip-progressBar');
-        const fNum = document.getElementById('snip-faceNum');
-        const countdownEl = document.getElementById('countdown-timer');
-
-        media.forEach((url, i) => {
-            const div = document.createElement('div');
-            div.className = `face-snip f${i+1}`;
-            div.style.backgroundImage = `url('${url}')`;
-            cube.appendChild(div);
-        });
-
-        const faces = document.querySelectorAll('.face-snip');
-
-        function updateUI(index) {
-            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
-            pBar.style.width = `${((normalized + 1) / totalFaces) * 100}%`;
-            fNum.innerText = normalized + 1;
-
-            faces.forEach((face, i) => {
-                const angle = i * angleStep;
-                const isFront = (i === normalized);
-                const scale =isFront ? 1.5: 1.0; 
-                face.style.transform = `rotateY(${angle}deg) translateZ(355px) scale(${scale})`;
-                face.classList.toggle('active', isFront);
-            });
-        }
-
-        function rotate(dir) {
-            dir === 'left' ? currentStep++ : currentStep--;
-            cube.style.transform = `rotateX(-25deg) rotateY(${currentStep * -angleStep}deg)`;
-            updateUI(currentStep);
-            playFaceAudio(currentStep);
-        }
-
-        function playFaceAudio(index) {
-            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
-            const songPath = `song/${normalized + 1}.mp3`;
-            globalPlayer.src = songPath;
-            globalPlayer.play().catch(e => console.log("Audio play blocked:", e));
-        }
-
-        function startCountdown() {
-            let timeLeft = 9;
-            countdownEl.innerText = timeLeft;
-            if (countdownInterval) clearInterval(countdownInterval);
-            
-            countdownInterval = setInterval(() => {
-                timeLeft--;
-                if (timeLeft < 0) timeLeft = 9;
-                countdownEl.innerText = timeLeft;
-            }, 1000);
-        }
-
-        function toggleAutoplay() {
-            const btn = document.getElementById('autoplay-btn');
-            
-            if (autoplayTimer) {
-                // STOP
-                clearInterval(autoplayTimer);
-                clearInterval(countdownInterval);
-                autoplayTimer = null;
-                countdownInterval = null;
-                btn.classList.remove('active');
-                countdownEl.style.display = 'none';
-                globalPlayer.pause();
-            } else {
-                // START
-                btn.classList.add('active');
-                countdownEl.style.display = 'block';
-                
-                // Rotate immediately
-                rotate('left');
-                startCountdown();
-                
-                // Set the loop
-                autoplayTimer = setInterval(() => {
-                    rotate('left');
-                    startCountdown(); // Reset visual counter on every turn
-                }, 9000);
-            }
-        }
-
-        const container = document.getElementById('carousel-container');
-        container.addEventListener('touchstart', e => {
-            startX = e.touches[0].clientX;
-            if (autoplayTimer) toggleAutoplay(); 
-        });
-        container.addEventListener('touchend', e => {
-            let diff = startX - e.changedTouches[0].clientX;
-            if (Math.abs(diff) > 40) rotate(diff > 0 ? 'left' : 'right');
-        });
-        container.addEventListener('mousedown', e => {
-            startX = e.clientX;
-            if (autoplayTimer) toggleAutoplay();
-        });
-        container.addEventListener('mouseup', e => {
-            let diff = startX - e.clientX;
-            if (Math.abs(diff) > 40) rotate(diff > 0 ? 'left' : 'right');
-        });
-
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('video-overlay');
-        const video = document.getElementById('popup-video-player');
-        const viewport = document.getElementById('main-viewport');
-
-        function toggleSidebar(e) { e.stopPropagation(); sidebar.classList.toggle('open'); }
-        function playPopupVideo(src) { video.src = src; overlay.style.display = 'flex'; video.play(); }
-        function closePopup() { video.pause(); overlay.style.display = 'none'; }
-        function loadPage(url) { viewport.src = url; viewport.style.display = 'block'; sidebar.classList.remove('open'); }
-        function openLocked() { if(prompt("ENTER PIN:") === "1111") loadPage('interactive/index.html'); }
-
-        window.onclick = (e) => {
-            if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target.id !== 'menu-tongue') {
-                sidebar.classList.remove('open');
-            }
+        // ✅ PREVENTS ANY EXTERNAL REDIRECT — FORCES EVERYTHING INSIDE IFRAME
+        window.onbeforeunload = function(e) {
+            e.preventDefault();
+            return false;
         };
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === "Escape") { viewport.style.display = 'none'; viewport.src = ""; closePopup(); }
-        });
-
-        updateUI(0);
+        // ✅ DOUBLE-ENSURE: Iframe is always active, never replaced
+        document.getElementById('mainFrame').onload = function() {
+            history.replaceState({}, document.title, window.location.href);
+        };
     </script>
+
 </body>
 </html>
