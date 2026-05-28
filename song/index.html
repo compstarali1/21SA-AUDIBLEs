@@ -2,288 +2,828 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Modern 3D 17-Face Carousel</title>
-    <style>
-        body {
-            margin: 0;
-            height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: black;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            touch-action: none;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Dominant | The Lesson 🖤</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        obsidian: {
+                            950: '#080508',
+                            900: '#100a10',
+                            800: '#1a111a',
+                            700: '#251825',
+                        },
+                        blood: {
+                            500: '#ff2255',
+                            600: '#e01144',
+                            700: '#b80033',
+                            800: '#900029',
+                            light: '#ff6688',
+                        },
+                        cream: {
+                            100: '#fff0f5',
+                            200: '#ffd6e2',
+                            300: '#ffb8cc',
+                            400: '#ff99bb',
+                        }
+                    },
+                    fontFamily: {
+                        display: ['"Cinzel"', 'serif'],
+                        body: ['"Lora"', 'Georgia', 'serif'],
+                        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
         }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto { content-visibility: auto; }
+            .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            .scrollbar-hide::-webkit-scrollbar { display: none; }
+            .section-anchor { scroll-margin-top: 3rem; }
 
-        .bg-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('bg.gif');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.4;
-            z-index: -1;
+            /* ✅ NEW: FIXED BACKGROUND - NEVER MOVES + FIT WIDTH/AUTO HEIGHT + OPACITY 0.5 */
+            .bg-custom-fixed {
+                position: fixed;
+                inset: 0;
+                z-index: 0;
+                background: #000;
+                background-image: url('bg1.jpg'); /* ✅ YOUR IMAGE LINK DIRECTLY HERE */
+                background-size: 100% auto; /* fit width, scale height - no crop */
+                background-position: top center;
+                background-repeat: no-repeat;
+                background-attachment: fixed; /* 🧊 LOCKED / FIXED - NO SCROLL */
+            }
+            /* Dark overlay opacity 0.5 */
+            .bg-custom-fixed::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5); /* exactly 50% opacity */
+                z-index: 1;
+            }
+
+            /* ✅ NEW: SCROLLABLE CONTENT LAYER - ONLY TEXT SCROLLS */
+            .scroll-content {
+                position: relative;
+                z-index: 10; /* sits ON TOP of fixed bg */
+                min-height: 100vh;
+                overflow-y: visible;
+            }
+
+            /* ✅ NEW: TEXT GLOW EFFECT - ALWAYS VISIBLE WHILE SCROLLING */
+            .glow-text {
+                color: #fff0f5;
+                text-shadow: 
+                    0 0 4px rgba(255, 240, 245, 0.6),
+                    0 0 8px rgba(255, 184, 204, 0.45),
+                    0 0 12px rgba(255, 102, 136, 0.3),
+                    0 0 16px rgba(255, 34, 85, 0.15);
+                transition: text-shadow 0.3s ease;
+            }
+            /* Stronger glow on bold/strong text */
+            .glow-text strong, .glow-text b {
+                color: #ffb8cc;
+                text-shadow: 
+                    0 0 6px rgba(255, 184, 204, 0.8),
+                    0 0 12px rgba(255, 102, 136, 0.6),
+                    0 0 18px rgba(255, 34, 85, 0.4),
+                    0 0 24px rgba(224, 17, 68, 0.25);
+                font-weight: 600;
+            }
+            /* Header extra bright glow */
+            .glow-header {
+                text-shadow: 
+                    0 0 6px rgba(255, 240, 245, 0.8),
+                    0 0 12px rgba(255, 184, 204, 0.65),
+                    0 0 20px rgba(255, 102, 136, 0.45),
+                    0 0 28px rgba(255, 34, 85, 0.3),
+                    0 0 36px rgba(224, 17, 68, 0.15);
+            }
+
+            /* ✅ CUSTOM 3D BUTTON & PROGRESS BAR STYLES */
+            .audio-btn-3d {
+                background: linear-gradient(145deg, #251825, #080508);
+                box-shadow: 
+                    6px 6px 12px rgba(0,0,0,0.6),
+                    -6px -6px 12px rgba(255,255,255,0.05),
+                    inset 0 0 0 rgba(184,0,51,0);
+                border: 1px solid rgba(255,34,85,0.2);
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .audio-btn-3d:hover {
+                background: linear-gradient(145deg, #2b1c2b, #100a10);
+                box-shadow: 
+                    6px 6px 12px rgba(0,0,0,0.7),
+                    -6px -6px 12px rgba(255,255,255,0.07),
+                    inset 0 0 15px rgba(255,34,85,0.15);
+                border-color: rgba(255,34,85,0.4);
+                color: #ffb8cc !important;
+                transform: translateY(-1px);
+            }
+            .audio-btn-3d.playing {
+                background: linear-gradient(145deg, #900029, #b80033);
+                box-shadow: 
+                    4px 4px 8px rgba(0,0,0,0.5),
+                    -4px -4px 8px rgba(255,102,136,0.15),
+                    inset 0 0 12px rgba(255,184,204,0.25);
+                border-color: #ff2255;
+                color: #ffffff !important;
+            }
+
+            /* 3D Progress Bar - 80% WIDTH, CENTERED, BRIGHTER FILL */
+            .progress-container-3d {
+                position: fixed;
+                top: 22px;
+                left: 50%;
+                transform: translateX(-50%) translateY(-10px);
+                width: 80% !important; /* ✅ EXACTLY 80% WIDTH */
+                max-width: 1100px;
+                height: 12px;
+                background: linear-gradient(145deg, #100a10, #251825); /* Dark background */
+                border-radius: 12px;
+                box-shadow: 
+                    inset 3px 3px 6px rgba(0,0,0,0.7),
+                    inset -3px -3px 6px rgba(255,255,255,0.04),
+                    0 4px 12px rgba(0,0,0,0.4);
+                border: 1px solid rgba(255,34,85,0.12);
+                overflow: hidden;
+                z-index: 99998;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .progress-container-3d.active {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            /* ✅ FILL IS BRIGHTER THAN BACKGROUND (AS REQUESTED) */
+            .progress-fill-3d {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(90deg, #b80033, #ff2255, #ff6688); /* BRIGHTER red glow */
+                border-radius: 12px;
+                box-shadow: 
+                    inset 2px 2px 4px rgba(255,255,255,0.25),
+                    inset -2px -2px 4px rgba(144,0,41,0.4),
+                    0 0 14px rgba(255,34,85,0.6),
+                    0 0 22px rgba(255,102,136,0.35);
+                transition: width 0.1s linear;
+                position: relative;
+            }
+            /* Shine animation */
+            .progress-fill-3d::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+                animation: shine 2s infinite linear;
+            }
+            @keyframes shine {
+                100% { left: 100%; }
+            }
+
+            .time-label {
+                position: absolute;
+                top: 18px;
+                font-size: 11px;
+                font-weight: 600;
+                color: #ffb8cc;
+                text-shadow: 0 0 4px #000;
+                pointer-events: none;
+                opacity: 0.8;
+            }
+            .time-current { left: 8px; }
+            .time-total { right: 8px; }
         }
+        /* =============================================
+   🆕 UNIFIED 3D FROSTED BUTTON STYLE (BOTH BUTTONS)
+   High contrast, deep 3D, always visible, animated
+============================================= */
+.btn-3d-frosted {
+    position: fixed !important;
+    right: 18px !important;
+    z-index: 99999 !important; /* ON TOP OF EVERYTHING */
+    
+    /* Frosted Glass + Deep 3D Background */
+    background: linear-gradient(145deg, #120b12, #2a1c2a);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1.5px solid rgba(255, 60, 100, 0.35);
+    border-radius: 10px;
 
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: background 0.3s;
-        }
+    /* Strong 3D Shadows - HIGH DEPTH */
+    box-shadow: 
+        /* Outer shadow (depth) */
+        6px 6px 14px rgba(0, 0, 0, 0.75),
+        -6px -6px 14px rgba(255, 255, 255, 0.06),
+        /* Inner glow (highlight) */
+        inset 2px 2px 5px rgba(255, 180, 200, 0.12),
+        inset -2px -2px 5px rgba(0, 0, 0, 0.4);
 
-        .close-btn:hover { background: rgba(255, 0, 0, 0.5); }
+    /* Text & Icon: MAX CONTRAST, BRIGHT & SHARP */
+    color: #ffffff !important;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.4), 
+                 0 0 10px rgba(255, 80, 120, 0.35);
+    font-weight: 600;
 
-        .progress-wrapper {
-            position: absolute;
-            top: 40px;
-            width: 220px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            z-index: 10;
-        }
+    /* Smooth Animation */
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-        .progress-container {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+    padding: 0 20px !important;
+    height: 52px !important;
+    font-size: 15px !important;
+    letter-spacing: 0.3px;
+}
 
-        .progress-bar {
-            width: 5.88%; 
-            height: 100%;
-            background: linear-gradient(90deg, #00d2ff, #9d50bb);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.8);
-            transition: width 0.5s ease-out;
-        }
+/* 🟡 HOVER STATE - MORE 3D, BRIGHTER GLOW */
+.btn-3d-frosted:hover {
+    background: linear-gradient(145deg, #1a101a, #332233);
+    border-color: rgba(255, 80, 120, 0.55);
+    color: #fff !important;
+    text-shadow: 0 0 8px #fff, 0 0 15px #ff88aa, 0 0 22px #ff3366;
+    
+    /* Lift effect + stronger shadow */
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 
+        8px 8px 16px rgba(0, 0, 0, 0.8),
+        -8px -8px 16px rgba(255, 255, 255, 0.08),
+        inset 2px 2px 6px rgba(255, 180, 200, 0.18),
+        0 0 18px rgba(255, 40, 80, 0.25);
+}
 
-        .progress-text {
-            color: white;
-            font-size: 12px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
+/* 🔵 ACTIVE / CLICK STATE - PRESSED IN EFFECT */
+.btn-3d-frosted:active, .btn-3d-frosted.playing {
+    background: linear-gradient(145deg, #880025, #cc0044);
+    border-color: #ff4477;
+    transform: translateY(1px) scale(0.98);
+    box-shadow: 
+        3px 3px 8px rgba(0, 0, 0, 0.7),
+        -3px -3px 8px rgba(255, 100, 140, 0.12),
+        inset 3px 3px 8px rgba(120, 0, 35, 0.5);
+    text-shadow: 0 0 10px #ffffff, 0 0 20px #ff99bb;
+}
 
-        /* 3D Scene Adjustments */
-        .scene {
-            width: 160px; /* Smaller tiles */
-            height: 160px;
-            /* Perspective reduced to 800px to make the 3D depth more "deceptive" and aggressive */
-            perspective: 800px; 
-            margin-top: 20px;
-        }
+/* 🟣 MENU BUTTON EXTRA: LARGER SYMBOL, HIGHER CONTRAST ICON */
+#menuToggle {
+    left: 18px !important;
+    width: 52px !important;
+    font-size: 22px !important; /* BIGGER ICON */
+}
+#menuToggle i {
+    color: #ffffff !important;
+    filter: drop-shadow(0 0 4px #ff6688) drop-shadow(0 0 8px #ffffff);
+}
 
-        .cube {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            /* Added a slight tilt for better 3D visualization */
-            transform: rotateX(-15deg);
-            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-        }
+/* 🔴 POSITION EACH TOP RIGHT BUTTON STACKED */
+#audioToggleBtn {
+    top: 18px !important;
+}
+#surrenderedAudioBtn {
+    top: 80px !important; /* ✅ PLACED DIRECTLY BELOW NARRATION BUTTON */
+}
 
-        .face {
-            position: absolute;
-            width: 140px; 
-            height: 140px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 0 30px rgba(0,0,0,0.9), inset 0 0 10px rgba(255,255,255,0.05);
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backface-visibility: visible; /* Back images now visible in the wheel */
-            border-radius: 6px;
-        }
+.btn-3d-frosted i {
+    font-size: 18px !important;
+}
 
-        /* 
-           Calculation for 17 faces:
-           Angle = 360 / 17 ≈ 21.176deg
-           Distance (translateZ) = (width/2) / tan(PI / 17)
-           Distance = 70 / tan(10.588deg) ≈ 375px 
-        */
-        .f1  { transform: rotateY(calc(21.176deg * 0))  translateZ(375px); background-image: url('1.gif'); }
-        .f2  { transform: rotateY(calc(21.176deg * 1))  translateZ(375px); background-image: url('2.jpg'); }
-        .f3  { transform: rotateY(calc(21.176deg * 2))  translateZ(375px); background-image: url('3.gif'); }
-        .f4  { transform: rotateY(calc(21.176deg * 3))  translateZ(375px); background-image: url('4.gif'); }
-        .f5  { transform: rotateY(calc(21.176deg * 4))  translateZ(375px); background-image: url('5.gif'); }
-        .f6  { transform: rotateY(calc(21.176deg * 5))  translateZ(375px); background-image: url('6.gif'); }
-        .f7  { transform: rotateY(calc(21.176deg * 6))  translateZ(375px); background-image: url('7.gif'); }
-        .f8  { transform: rotateY(calc(21.176deg * 7))  translateZ(375px); background-image: url('8.gif'); }
-        .f9  { transform: rotateY(calc(21.176deg * 8))  translateZ(375px); background-image: url('9.jpg'); }
-        .f10 { transform: rotateY(calc(21.176deg * 9))  translateZ(375px); background-image: url('10.jpg'); }
-        .f11 { transform: rotateY(calc(21.176deg * 10)) translateZ(375px); background-image: url('11.jpg'); }
-        .f12 { transform: rotateY(calc(21.176deg * 11)) translateZ(375px); background-image: url('12.jpg'); }
-        .f13 { transform: rotateY(calc(21.176deg * 12)) translateZ(375px); background-image: url('13.jpg'); }
-        .f14 { transform: rotateY(calc(21.176deg * 13)) translateZ(375px); background-image: url('14.jpg'); }
-        .f15 { transform: rotateY(calc(21.176deg * 14)) translateZ(375px); background-image: url('15.jpg'); }
-        .f16 { transform: rotateY(calc(21.176deg * 15)) translateZ(375px); background-image: url('16.jpg'); }
-        .f17 { transform: rotateY(calc(21.176deg * 16)) translateZ(375px); background-image: url('17.jpg'); }
-        
-        .swipe-helper {
-            display: flex;
-            align-items: center;
-            gap: 60px;
-            margin-top: 50px;
-            z-index: 10;
-        }
-
-        .arrow {
-            color: white;
-            font-size: 24px;
-            opacity: 0.4;
-            animation: pulseArrow 2s infinite ease-in-out;
-            user-select: none;
-        }
-
-        @keyframes pulseArrow {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.2); }
-        }
-
-        .instruction {
-            margin-top: 10px;
-            color: #00d2ff;
-            opacity: 0.6;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="bg-overlay"></div>
-    <button class="close-btn" onclick="closeSubProgram()">×</button>
+    <!-- 🖤 FIXED BACKGROUND - ALWAYS BEHIND, NEVER SCROLLS -->
+    <div class="bg-custom-fixed"></div>
 
-    <div class="progress-wrapper">
-        <div class="progress-text">PORTAL <span id="faceNum">1</span> / 17</div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+    <!-- ✅ SCROLLABLE CONTENT - ONLY THIS PART MOVES -->
+    <div class="scroll-content">
+    	
+<!-- 🆕 MENU TOGGLE - TOP LEFT • 3D FROSTED • HIGH CONTRAST -->
+<button id="menuToggle" class="btn-3d-frosted">
+    <i class="fa fa-bars"></i>
+</button>
+
+<!-- 🆕 NARRATION / AUDIO BUTTON - TOP RIGHT • 1ST -->
+<button id="audioToggleBtn" class="btn-3d-frosted">
+    <i class="fa fa-headphones"></i>
+    <span class="hidden sm:inline">Listen • Narration</span>
+    <span class="inline sm:hidden">Audio</span>
+</button>
+
+<!-- 🆕 SURRENDERED BUTTON - TOP RIGHT • 3RD BUTTON • DIRECTLY BELOW NARRATION ✅ -->
+<button id="surrenderedAudioBtn" class="btn-3d-frosted">
+    <i class="fa fa-heart"></i>
+    <span class="hidden sm:inline">Listen • Surrendered</span>
+    <span class="inline sm:hidden">Surrender</span>
+</button>
+
+
+        <!-- 📊 NEW: 3D PROGRESS BAR - 80% WIDTH, HIDDEN BY DEFAULT -->
+        <div id="progressBarWrap" class="progress-container-3d">
+            <div id="progressFill" class="progress-fill-3d"></div>
+            <div class="time-label time-current" id="currentTime">00:00</div>
+            <div class="time-label time-total" id="totalTime">00:00</div>
         </div>
-    </div>
 
-    <div class="scene">
-        <div class="cube" id="cube">
-            <div class="face f1"></div>
-            <div class="face f2"></div>
-            <div class="face f3"></div>
-            <div class="face f4"></div>
-            <div class="face f5"></div>
-            <div class="face f6"></div>
-            <div class="face f7"></div>
-            <div class="face f8"></div>
-            <div class="face f9"></div>
-            <div class="face f10"></div>
-            <div class="face f11"></div>
-            <div class="face f12"></div>
-            <div class="face f13"></div>
-            <div class="face f14"></div>
-            <div class="face f15"></div>
-            <div class="face f16"></div>
-            <div class="face f17"></div>
-        </div>
-    </div>
+        <!-- ===== FLOATING TABLE OF CONTENTS (SIDEBAR) ===== -->
+        <aside id="tocSidebar" class="fixed top-0 left-0 h-full w-[280px] bg-obsidian-900/70 backdrop-blur-md border-r border-blood-900/40 z-[90] transform -translate-x-full transition-transform duration-300 ease-out shadow-2xl overflow-y-auto scrollbar-hide">
+            <div class="p-5 pt-16">
+                <h3 class="font-display text-xl font-bold text-blood-400 mb-4 flex items-center">
+                    <i class="fa fa-bookmark mr-2"></i> LESSON NAV
+                </h3>
+                <nav class="space-y-1.5 text-sm">
+                    <a href="#start" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🖤 Arrival</a>
+                    <a href="#tease" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">😈 The Tease</a>
+                    <a href="#desk" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🔞 Over The Desk</a>
+                    <a href="#fingers" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🫦 Fingers & Denial</a>
+                    <a href="#kneel" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🧎‍♀️ On Your Knees</a>
+                    <a href="#mouth" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">👅 Devoured</a>
+                    <a href="#cock" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🍆 Taking Every Inch</a>
+                    <a href="#breed" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">💦 Filled & Bred</a>
+                    <a href="#after" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">❤️ Aftercare & Ownership</a>
+                    <!-- ✅ NEW: SURRENDERED LINK ADDED TO NAV MENU -->
+                    <a href="#surrendered" class="toc-link block py-2 px-3 rounded-md hover:bg-blood-800/30 hover:text-blood-300 transition-colors glow-text">🩸 After Surrendering</a>
+                </nav>
 
-    <div class="swipe-helper">
-        <div class="arrow arrow-left">◀</div>
-        <div class="arrow arrow-right">▶</div>
-    </div>
-    <div class="instruction">Swipe to Explore</div>
+                <div class="mt-8 pt-4 border-t border-blood-900/30">
+                    <p class="text-cream-400/50 text-xs italic glow-text">Shortcuts:<br><kbd class="bg-obsidian-700/60 px-1.5 py-0.5 rounded text-blood-300">T</kbd> Toggle Menu • <kbd class="bg-obsidian-700/60 px-1.5 py-0.5 rounded text-blood-300">Esc</kbd> Close • <kbd class="bg-obsidian-700/60 px-1.5 py-0.5 rounded text-blood-300">Space</kbd> Play/Pause</p>
+                </div>
+            </div>
+        </aside>
 
+        <!-- ===== SCROLL TO TOP BUTTON ===== -->
+        <button id="scrollTop" class="fixed bottom-6 right-6 z-[80] w-11 h-11 rounded-full bg-blood-700/60 backdrop-blur-sm text-white flex items-center justify-center shadow-lg hover:bg-blood-600 transition-all opacity-0 invisible">
+            <i class="fa fa-chevron-up"></i>
+        </button>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="relative z-10 max-w-[1100px] mx-auto px-3 sm:px-5 py-12">
+            
+            <!-- HEADER -->
+            <header class="text-center mb-12 sm:mb-16">
+                <h1 class="glow-header font-display text-[clamp(2.5rem,6vw,4.5rem)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cream-100 via-blood-light to-blood-500 leading-none tracking-wider">
+                    PROFESSOR DOMINANT
+                </h1>
+                <p class="glow-text text-lg italic mt-3 max-w-xl mx-auto">
+                    "Obedience is your only lesson. Pleasure is your reward."
+                </p>
+                <div class="w-24 h-[2px] bg-gradient-to-r from-transparent via-blood-500 to-transparent mx-auto mt-6 rounded-full shadow-[0_0_8px_rgba(255,34,85,0.4)]"></div>
+            </header>
+
+            <!-- 🟢 MAIN STORY PLACEHOLDER - PASTE YOUR FULL PROFESSOR TEXT HERE ✅✅✅ -->
+            <article id="storyContent" class="glow-text prose prose-lg md:prose-xl max-w-none prose-p:leading-relaxed prose-strong:font-semibold prose-strong:tracking-wide">
+                
+                    <p>I walk in nervously, clutching my laptop and papers tight against my chest. The heavy wooden door clicks shut behind me, and the sound echoes loud in the quiet, dim room. My breath catches in my throat immediately the second I hear your voice. My heart is pounding so hard I swear you must be able to hear it from across the room.</p>
+
+                    <p>I stop right in front of your big mahogany desk, standing straight but looking down at my feet. Too shy to meet your gaze yet. My cheeks are already blushing bright pink — just like you like them. I bite my lip softly, slowly lifting my eyes to look up at you through my lashes, a tiny, naughty, knowing smile playing on my lips.</p>
+
+                    <p><strong>“Good morning, Professor…”</strong></p>
+
+                    <p>My voice comes out soft, shaky, breathless — exactly how you make me sound every single time I’m alone with you. I shift my weight from one foot to the other, squeezing my thighs together instinctively. My body still feels sensitive, tender, and sore from last night. I can still feel your hands gripping my hips, your weight pressing me down, the way you filled me up completely until I couldn’t think of anything but you. I remember every second of how you used me, owned me, took me apart and put me back together exactly how you wanted.</p>
+
+                    <p><strong>“…I dressed up nicely today, Sir. I wanted to look good for my Professor.”</strong></p>
+
+                    <p>I smooth my hands slowly down the fabric of my short, flowy skirt — the one you told me to wear. The material is so light, so thin, it barely covers anything at all. It rides up high on my thighs just from walking, and I know exactly what you can already see.</p>
+
+                <!-- 🟢 SECTION: THE TEASE -->
+                <div id="tease" class="section-anchor mb-8">
+                    <p><strong>“I’m here for my thesis, Sir… really need your help with it.”</strong> I pause, letting my voice drop even softer, more breathless. I look up at you through my lashes again, my eyes dark and heavy with lust already. <strong>“…But I think… I think I need more than just academic guidance today, don’t I?”</strong></p>
+
+                    <p>My breath hitches sharply in my throat. My cheeks instantly burn bright red, hot all the way down my neck and chest. I press my thighs together tighter, feeling exactly how exposed I am underneath this skirt — no panties, just like you ordered me this morning in your text. I bite down hard on my lip to stop a nervous, excited giggle from escaping. I look down shyly for a moment, then slowly lift my eyes back up to lock onto yours, batting my lashes innocently while my gaze tells you everything I’m thinking.</p>
+
+                    <p>You lean back in your big leather chair, arms crossed over your chest, watching me like a predator watching its favorite prey. Your voice drops low, deep, rough — that dominant tone that makes my knees weak instantly.</p>
+
+                    <p><strong>“Look at you… walking in here dressed like that. Skirt barely covering anything. Flirting with me with your eyes, your voice. Do you think I don’t know exactly what you’re doing, little girl?”</strong></p>
+
+                    <p>I shiver all over, goosebumps rising everywhere. My nipples harden painfully against my thin blouse just hearing your tone.</p>
+
+                    <p><strong>“I… I don’t know, Sir…”</strong> I whisper, voice trembling, playing innocent perfectly. <strong>“Maybe… maybe the wind blew it up on the way here?”</strong> I take a tiny step closer, looking right at you with that naughty, challenging look in my eyes. <strong>“…Or maybe… maybe I did it on purpose, Prof?”</strong></p>
+
+                    <p>I deliberately smooth my hands down my skirt again, pulling the fabric up just a tiny bit higher — high enough that if I shifted even an inch, you’d see absolutely everything. I let the material ride up completely, exposing the soft skin of my upper thighs, letting you see exactly how bare I am underneath.</p>
+
+                    <p><strong>“Just wanted to save you the trouble of having to lift it up yourself today, Sir.”</strong> I say softly, shamelessly, stepping even closer until I’m standing right at the edge of your desk. <strong>“Wanted you to be able to see exactly what belongs to you. Remind you how wet and ready I can get for you… just in case you wanted to check my work again. Privately.”</strong></p>
+                </div>
+
+                <!-- 🟢 SECTION: OVER THE DESK -->
+                <div id="desk" class="section-anchor mb-8">
+                    <p>You stand up slowly, leaning forward over the desk until your face is inches from mine. Your dark eyes bore right into mine, stripping me bare with just a look.</p>
+
+                    <p><strong>“Check your work? Is that what you call it? You walked into my office practically naked, teasing me, tempting me… thinking you can just flash your little pussy at me and get whatever you want, isn’t that right?”</strong></p>
+
+                    <p>My whole body shudders visibly. I let out a tiny, shaky gasp. My knees actually go weak hearing you say that so boldly, so dirty, so commanding — right here in your office, where anyone could walk in if the door wasn’t locked. I bite my lip hard, my eyes fluttering shut for a second before opening wide, dark and heavy with pure lust.</p>
+
+                    <p><strong>“Oh god… Sir…”</strong> I whimper, voice trembling and thick with need. I look right at you, eyes hungry, desperate. <strong>“I took them off before I even left my apartment, Professor. I admit it… shamelessly. I walked out of my front door with absolutely nothing on underneath this skirt. Wanted to feel the air on my skin. Wanted to feel exposed. Wanted to be ready for you the second I walked through that door. Because I know… I know there’s no line anymore between what’s yours and what’s mine. Everything is yours. Isn’t it?”</strong></p>
+
+                    <p>I shift my weight, spreading my legs just slightly — enough to give you the perfect view up my skirt, right to where I’m already glistening wet, dripping for you, aching to be touched. I watch your eyes darken even further, pupils blowing wide with desire, your control slipping just a little bit — and I love knowing <em>I</em> did that to you.</p>
+
+                    <p><strong>“Everything is mine,”</strong> you growl low in your chest, reaching out to grip my jaw firmly, fingers pressing into my skin, forcing me to keep looking right at you. <strong>“Every inch of this body. Every thought in that little head. Every drop of this sweet little pussy. It all belongs to me. You understand that? You don’t walk around naked for anyone else. You don’t tease anyone else. You only exist to turn <em>me</em> on. To please <em>me</em>. To take whatever <em>I</em> give you.”</strong></p>
+
+                    <p><strong>“Y-yes, Sir! Only you… only ever you!”</strong> I whimper, melting completely under your touch, hips instinctively bucking forward just a little bit, desperate for friction, desperate for you to touch me anywhere. <strong>“I’m yours. Completely. Forever.”</strong></p>
+
+                    <p><strong>“Good girl.”</strong> You smirk, that wicked, possessive smirk that makes me throb between my legs. You let go of my jaw only to slide your hand slowly down my neck, over my chest, cupping one of my breasts roughly through my blouse, squeezing hard enough to make me gasp and arch into your hand. <strong>“You’re so wet already. Just from me talking to you. Just from me looking at you. You’re pathetically easy to turn on, aren’t you? Just a needy little slut for her Professor.”</strong></p>
+
+                    <p><strong>“I am!”</strong> I cry out, shameless, soaking wet, loving every humiliating, perfect word coming out of your mouth. <strong>“I’m your needy little slut! I love when you talk to me like that! Love when you treat me like your dirty little toy!”</strong></p>
+
+                    <p><strong>“Oh, I will treat you exactly like my toy today,”</strong> you promise darkly, stepping around the desk, moving behind me. Your hands slide down my sides, gripping my hips hard, pulling me back tight against your body so I can feel exactly how hard you are for me, pressing right against my ass through your trousers. <strong>“You came here begging for attention, acting like a tease… so you’re going to get exactly what you asked for. But you better remember one thing, sweetheart: <em>I</em> make the rules. <em>I</em> decide how this goes. And you… you just obey. If you do exactly what I say, maybe I’ll be nice to you. If you disobey… if you try to tease me too much… you’re going to regret it. Do I make myself clear?”</strong></p>
+
+                    <p><strong>“Crystal clear, Sir!”</strong> I pant, head falling back against your shoulder, eyes rolling back as you grind your hard cock against my bare ass through the thin fabric. <strong>“I’ll be good! I promise! I’ll do anything you want!”</strong></p>
+
+                    <p><strong>“Anything?”</strong> You whisper against my ear, biting down softly on my earlobe, sending electric shocks straight to my dripping core. <strong>“Good. Because I have so many things I want to do to you right now.”</strong></p>
+
+                    <p>You spin me around suddenly, pushing me forward until my chest is pressed flat against the cold hard surface of your desk. You grab my wrists, pinning them behind my back with one strong hand, holding me completely helpless, exactly how you like me. With your other hand, you hike my skirt all the way up, bunching the fabric around my waist, exposing my entire lower half completely to the cool air, to your eyes, to your touch.</p>
+                </div>
+
+                <!-- 🟢 SECTION: FINGERS & DENIAL -->
+                <div id="fingers" class="section-anchor mb-8">
+                    <p><strong>“Look at this…”</strong> you murmur, running one finger slowly, torturously slowly, through my wet folds, spreading my slickness all over my skin, making me shudder and whimper loud. <strong>“So wet. So open. Just waiting for me. You practically leaked all over my desk just from standing here talking to me. Disgusting… and so fucking perfect.”</strong></p>
+
+                    <p><strong>“Please… Sir… touch me properly…”</strong> I beg, squirming against your grip, trying to push my hips back against you, desperate for more pressure, more friction, <em>anything</em>. <strong>“Need you so bad… I ache for you all the time…”</strong></p>
+
+                    <p><strong>“Quiet,”</strong> you snap sharply, landing a firm, stinging smack right across my bare ass cheek — hard enough to make me yelp and jerk forward, but not enough to hurt too much. Just enough to remind me exactly who is in charge. <strong>“You don’t tell me what to do. You don’t ask for anything. You wait until <em>I</em> give it to you. You take what I give you, and you thank me for it. Understood?”</strong></p>
+
+                    <p><strong>“Y-yes Sir! I’m sorry Sir! Thank you Sir!”</strong> I babble instantly, my mind turning to pure mush, my body trembling with equal parts fear, excitement, and overwhelming pleasure. <strong>“I’ll be quiet! I’ll be good! Please… please use me however you want…”</strong></p>
+
+                    <p><strong>“That’s much better.”</strong> You slide two thick fingers deep inside me without warning, burying them to the knuckles in one sharp, rough thrust. I scream out loud, face pressing hard against the wood of your desk, eyes rolling back, legs shaking so hard I almost collapse right there. You don’t give me a second to adjust — you start pumping your fingers in and out fast, hard, deep, curling them perfectly to hit that spot deep inside me that only <em>you</em> ever seem to find. You use your thumb to rub hard, fast, rough circles against my sensitive clit, grinding right down on it, making me see stars instantly.</p>
+
+                    <p><strong>“God… you feel so good… so tight… so wet…”</strong> You growl into my ear, biting the back of my neck, marking me, claiming me. <strong>“This pussy was made for my fingers. Made for my cock. No one else gets to feel this. No one else gets to make you scream like this. Only me. Say it.”</strong></p>
+
+                    <p><strong>“Only you!”</strong> I sob, tears of pleasure pricking my eyes, my whole body tightening, coiling, ready to snap. <strong>“Only you can make me feel this good! I belong to you! Every single inch of me is yours! Please… please… I’m so close… please let me cum Sir please let me cum for you!”</strong></p>
+
+                    <p>I’m right on the edge, trembling, screaming, my muscles clamping down hard around your fingers, begging for release — when suddenly you pull your hand completely away, leaving me empty, aching, throbbing, desperate and denied. I let out a broken, devastated whimper, slumping forward against the desk, completely ruined and desperate.</p>
+
+                    <p><strong>“Did I say you could cum?”</strong> You ask, voice calm, cold, cruel, right against my ear. You run your hand slowly, lightly, tauntingly down my back, tracing my spine, making me shiver uncontrollably. <strong>“Did I give you permission to finish, little girl?”</strong></p>
+
+                    <p><strong>“N-no Sir…”</strong> I whisper, voice cracking, tears actually spilling over now from the frustration, from how badly I need it. <strong>“You didn’t say I could… I’m sorry Sir… please… please forgive me…”</strong></p>
+
+                    <p><strong>“I don’t think you’re sorry yet,”</strong> you muse, stepping back, letting go of my wrists, leaving me bent over your desk, completely exposed, dripping wet, aching and empty. <strong>“Stand up. Turn around. Hands behind your back. Eyes down. Don’t move until I tell you to. If you touch yourself even once… we stop completely, and you get nothing for a week. Do you understand the rules?”</strong></p>
+
+                    <p><strong>“Yes Sir… perfectly Sir…”</strong> I scramble to obey instantly, standing straight, hands clasped tight behind my back, eyes fixed firmly on the floor, heart hammering wildly. I feel your gaze roaming over every inch of me — my flushed face, my heaving chest, my hard nipples poking through my thin shirt, my trembling legs, my soaked, exposed pussy. I feel like prey being inspected, and I wouldn’t have it any other way.</p>
+                </div>
+
+                <!-- 🟢 SECTION: ON YOUR KNEES -->
+                <div id="kneel" class="section-anchor mb-8">
+                    <p><strong>“Come here,”</strong> you command, sitting back down in your big leather chair, spreading your legs wide, unbuckling your belt slowly, the sound loud and heavy in the silence. <strong>“Stand right between my legs. Knees apart. Pull your shirt off. I want to see your tits. All of them. Right now.”</strong></p>
+
+                    <p>I obey immediately, fingers fumbling eagerly with the buttons of my blouse, tossing it carelessly onto the floor, leaving me completely topless, standing before you in nothing but my tiny, barely-there skirt bunched around my waist, bare skin flushed and trembling, nipples hard and aching.</p>
+
+                    <p><strong>“So beautiful…”</strong> you murmur, reaching out to cup both of my breasts in your big, rough hands, squeezing, kneading, pinching my nipples hard between your fingers until I’m gasping and arching my chest forward into your touch, offering myself completely to you. <strong>“Perfect tits. Made to be played with. Made to be sucked on. Made to leak milk for me one day, isn’t that right?”</strong></p>
+
+                    <p><strong>“Y-yes Sir… anything you want…”</strong> I whimper, my head falling back, eyes fluttering shut as you twist and pull at my sensitive nipples, sending waves of pleasure shooting straight down to my throbbing core. <strong>“I want everything you want… want to give you everything…”</strong></p>
+
+                    <p><strong>“I know you do.”</strong> You let go of my breasts only to grab my hips, yanking me forward until I’m standing right between your spread legs, my thighs brushing against yours, my wet pussy right at eye level with your face. You grip my hips hard, digging your fingers into my soft flesh, holding me completely still so I can’t move an inch.</p>
+
+                    <p><strong>“Now… you’re going to stand right here. You’re going to spread your legs wide for me. You’re going to let me eat this sweet little pussy until I decide you’ve earned your release. And you are <em>not</em> going to cum until I tell you to. If you cum without permission… I edge you for an hour. Do you want that? Do you want to be teased and denied over and over until you’re crying and begging to be allowed to finish?”</strong></p>
+
+                    <p><strong>“N-no Sir! Please no Sir! I’ll be good! I’ll hold it! I promise!”</strong> I plead, trembling all over just imagining how cruel and delicious that would be — but knowing I couldn’t handle it right now, not when I’m already so far gone. <strong>“I’ll wait! I’ll be patient! Please just… please taste me Sir… I need your mouth on me so bad…”</strong></p>
+
+                    <p><strong>“Beg for it properly then,”</strong> you order, leaning back, watching me with dark amusement, enjoying every second of my desperation. <strong>“Tell me exactly what you want me to do to you. Tell me how dirty you are.”</strong></p>
+
+                    <p>I drop to my knees right there on the floor between your legs, looking up at you with wide, watery, worshipping eyes. I reach up to grip your knees, pressing my cheek against your thigh, completely humbled, completely yours.</p>
+
+                    <p><strong>“Please Sir… please put your mouth on my pussy… please lick me, suck me, eat me until I’m shaking and screaming… please make me feel good… I’m such a dirty, slutty student for you… I’m so wet and messy and I need you to clean me up with your tongue… use me however you want… degrade me… humiliate me… just please touch me with your mouth… I’m begging you Professor… I’m begging you to ruin me…”</strong></p>
+
+                    <p>A low, dark growl rumbles in your chest. <strong>“That’s it… that’s exactly what I want to hear. You sound so pretty when you beg like a whore.”</strong></p>
+                </div>
+
+                <!-- 🟢 SECTION: DEVOURED -->
+                <div id="mouth" class="section-anchor mb-8">
+                    <p>You grip my hair tightly in your fist, yanking my head back slightly to look right at you, before pulling me forward and down until my dripping core is right against your face. You don’t hesitate — you dive right in, burying your face completely between my legs, licking a long, hard, deep stripe right through my folds, from my wet entrance all the way up to my sensitive clit, sucking the whole bundle of nerves hard into your hot, wet mouth.</p>
+
+                    <p>I scream loud, hands flying down to grip the arms of your chair, my hips bucking wildly against your face, completely out of control. Your tongue is rough, thick, strong — you know exactly how to use it, flicking fast circles against my clit, pushing deep inside my hole, drinking down every drop of my arousal like you’re starving for it, like I’m the sweetest thing you’ve ever tasted. You hold me down firmly with your strong arms wrapped tight around my thighs, pinning me right against your face so I can’t escape, so I have to take every lick, every suck, every thrust of your tongue exactly how <em>you</em> want to give it to me.</p>
+
+                    <p><strong>“God… GOD… SIR… YES… RIGHT THERE… PLEASE DON’T STOP…”</strong> I’m sobbing, moaning, screaming, my whole body shaking violently, pleasure crashing over me in huge, overwhelming waves. It feels better than anything — better than my own fingers, better than anything I’ve ever felt before. Only <em>you</em> can make me feel this way. Only you can turn my brain completely to jelly and make me nothing but a trembling, screaming mess.</p>
+
+                    <p>You keep going — harder, faster, deeper — alternating between sucking hard on my clit and shoving your tongue deep inside me, fucking me with your mouth, devouring me completely. You groan low and hungry against my skin, the vibration shooting straight through my body, making me scream louder, my muscles tightening, coiling, ready to explode. I’m right on the edge again, so close I can taste it, my toes curling, my vision blurring, my mind completely gone —</p>
+
+                    <p><strong>“Sir… Sir I’m gonna cum… I’m gonna cum please please please can I cum Sir PLEASE LET ME CUM I CAN’T HOLD IT ANYMORE PLEASE!”</strong> I scream, completely breaking down, begging, pleading, tears streaming down my face from the intensity.</p>
+
+                    <p>You pull back just enough to growl against my wet, sensitive skin, voice dark and rough and full of command: <strong>“Cum for me then. Cum hard. Scream my name. Show me exactly who owns every single one of your orgasms.”</strong></p>
+
+                    <p>That’s all the permission I need. I throw my head back, screaming your name — <strong>“PROFESSOR ALI! OH GOD ALI YESSS!”</strong> — as the most blinding, powerful, earth-shattering orgasm rips through my entire body. My legs shake uncontrollably, my whole body seizes up, my pussy clamping down hard around nothing, gushing and soaking your face, your shirt, your chair, everything. I’m seeing stars, seeing white, completely lost in the pleasure, completely owned by you.</p>
+
+                    <p>You don’t stop. You keep licking, sucking, lapping up every drop of my release, dragging out my pleasure until I’m overstimulated, sensitive, twitching and whimpering, pushing weakly at your head because it feels too good, too much, almost painful but perfect. Only when I’m completely limp, collapsed forward against your chest, breathless, shaking, unable to move a muscle — only then do you finally pull back.</p>
+
+                    <p>You wipe your mouth with the back of your hand, looking down at me with that smug, possessive look in your eyes, like you just ate the best meal of your life. You reach down to grip my chin, lifting my face up to look at you, forcing my mouth open with your thumb.</p>
+
+                    <p><strong>“Open wide,”</strong> you command. I obey instantly. You push your thumb past my lips, right onto my tongue, pressing down hard. <strong>“Taste yourself. Taste how sweet and dirty you are for me. Swallow it all. Every drop. Show me you know exactly what you are — my cum-drunk little slut.”</strong></p>
+
+                    <p>I suck obediently on your thumb, tasting my own sweet, musky arousal, swallowing it down completely, looking up at you with eyes full of adoration and submission. I hum around your finger, loving the taste, loving how dirty this is, loving that you make me do this.</p>
+                </div>
+
+                <!-- 🟢 SECTION: TAKING HIS COCK -->
+                <div id="cock" class="section-anchor mb-8">
+                    <p><strong>“Good girl,”</strong> you murmur, pulling your thumb out of my mouth with a wet pop. You stand up, towering over me, undoing your trousers and pushing them down along with your boxers, letting your heavy, thick, hard cock spring free, slapping against your stomach. It’s huge, perfect, throbbing, leaking pre-cum from the tip — exactly what I’ve been craving all day. <strong>“But we aren’t done yet. Not even close. You wanted a lesson? You wanted private tutoring? Then you’re going to take every single inch of me. And you’re going to learn exactly what happens to naughty little girls who tease their Professor.”</strong></p>
+
+                    <p>You grip my hair again, pulling me up roughly to my feet, turning me around, bending me right back over your desk, pushing my face down into the wood, spreading my legs wide with your knee, exposing my swollen, sensitive, dripping pussy completely to you. You line the thick, blunt head of your cock right up against my entrance, rubbing it up and down through my wet folds, coating yourself in my slickness, teasing me, torturing me, making me whimper and push back against you desperate for it.</p>
+
+                    <p><strong>“Beg me for my cock,”</strong> you growl, slapping your heavy length hard against my sensitive clit, making me jerk and cry out. <strong>“Beg me to fill you up. Beg me to ruin this tight little pussy completely.”</strong></p>
+
+                    <p><strong>“PLEASE SIR! PLEASE FUCK ME! PLEASE STICK YOUR BIG COCK INSIDE ME! FILL ME UP COMPLETELY! RUIN ME! MAKE ME YOURS FOREVER! I NEED IT SO BAD I CAN’T BREATHE WITHOUT IT PLEASE PROFESSOR ALI PLEASE USE ME!”</strong> I scream into the desk, completely shameless, completely desperate, completely broken for you.</p>
+
+                    <p><strong>“Then take it.”</strong></p>
+
+                    <p>You push forward in one long, hard, unrelenting thrust, burying your entire length inside me in one go, right to the very base, balls deep, stretching me wider than I’ve ever been stretched before, filling every single empty space inside me completely. I scream so loud my throat hurts, my eyes rolling back, my hands clawing at the wood, my whole body shaking as I adjust to your massive size, to the overwhelming feeling of being completely full, completely owned, completely taken.</p>
+
+                    <p><strong>“God… look at you… swallowing every inch of me… so tight… so hot… squeezing me like you never want to let go…”</strong> You groan, leaning forward over my back, wrapping one strong arm tight around my chest, pinning me down completely, your other hand gripping my hip so hard I know there will be bruises tomorrow — <em>perfect, beautiful bruises</em>, marks that will remind me for days exactly who owns me. <strong>“This pussy belongs to me. It was made for me. I’m going to fuck you until you can’t walk straight. Until you forget every word you ever learned except <em>Professor</em> and <em>Sir</em>. Until you only know how to take my cock and thank me for it.”</strong></p>
+
+                    <p><strong>“Yes Sir! Only you! Only your cock fits me! Only you make me feel alive! Fuck me Sir! Use me like your cum dumpster! Do whatever you want to me!”</strong> I sob, pushing my hips back hard to meet every single one of your thrusts, completely meeting your rhythm, completely giving myself over to you.</p>
+
+                    <p>You start moving — fast, hard, deep, rough. You don’t hold back at all. You pound into me over and over and over, hitting that deep, sensitive spot inside me every single time, grinding your pelvis hard against my ass, your heavy balls slapping against me with every thrust, the sound of skin slapping against skin loud and dirty and perfect in the quiet office. You lean down to bite and suck at my neck, my shoulders, my back, leaving dark red marks all over my skin, claiming every inch, marking me as yours for everyone to see.</p>
+
+                    <p><strong>“You like this? You like getting fucked rough over my desk like the dirty little student slut you are?”</strong> You grunt, driving into me harder, faster, deeper, your pace relentless, unforgiving, exactly what I need. <strong>“You like knowing anyone could walk in and see exactly what a whore you are for your teacher? See you bent over, getting stuffed full of my cock, screaming my name?”</strong></p>
+
+                    <p><strong>“I LOVE IT! I LOVE IT SO MUCH! I WANT EVERYONE TO KNOW I BELONG TO YOU! I WANT EVERYONE TO KNOW I’M YOUR SLUTTY LITTLE STUDENT WHO ONLY LIVES TO GET FUCKED BY YOU!”</strong> I scream back, completely lost, completely wild, meeting every thrust, clawing at the desk, my mind nothing but pure pleasure and submission.</p>
+                </div>
+
+                <!-- 🟢 SECTION: FILLED & BRED -->
+                <div id="breed" class="section-anchor mb-8">
+                    <p><strong>“That’s right… get ready to cum again… cum all over my cock… make a mess all over my desk… show me what a good little cum slut you are…”</strong> you growl in my ear, your voice ragged and thick with your own pleasure, your thrusts getting faster, harder, more desperate as you get closer too. <strong>“I’m gonna fill this tight little hole so full of my cum you’ll be leaking it for days… walking around my campus with my seed dripping out of you… everyone will know exactly what you did in my office… exactly who owns you…”</strong></p>
+
+                    <p><strong>“OH GOD YES PLEASE! FILL ME UP SIR! BREED ME! FILL ME WITH YOUR CUM UNTIL I CAN’T HOLD IT ALL! MARK ME FROM THE INSIDE OUT! I WANT TO BE DRIPPING WITH YOU FOREVER!”</strong> I scream, completely feral, completely gone, my body exploding into a second, even more intense orgasm that rips through me, making me scream until I’m hoarse, my muscles clamping down hard, milking your cock for everything you’ve got, gushing all over you, all over the desk, all over the floor.</p>
+
+                    <p>You let out a loud, deep, animalistic roar right against my shoulder, driving deep inside me one last time, burying yourself completely to the hilt, grinding deep as you shoot thick, hot rope after rope of your cum deep inside me, filling me absolutely to the brim, pumping me full, claiming me completely from the inside out. You hold yourself deep inside me, staying buried there, twitching and pulsing as you empty yourself completely into me, marking me, owning me, sealing me shut with your seed.</p>
+
+                    <p>We stay like that for what feels like forever — you heavy on top of me, buried deep inside me, both of us shaking, breathless, completely spent, completely connected. You kiss the back of my neck softly, possessively, running your hands slowly, gently over my trembling body, down my sides, over my hips, claiming me even in the soft afterglow.</p>
+                </div>
+
+                <!-- 🟢 SECTION: AFTERCARE & ENDING -->
+                <div id="after" class="section-anchor mb-8">
+<p>Finally, slowly, you pull out of me, making me whimper softly at the empty feeling, feeling your warm cum immediately start to leak out of me, running down my inner thighs, dripping onto the floor. You stand up straight, pulling me up with you, turning me around to face you, pulling me tight against your chest, wrapping your arms around me completely, holding me close, safe, secure, like I’m the most precious thing in the world to you. I rest my head against your heart, listening to your strong, steady heartbeat slowly return to normal, my own heart still racing wildly, my whole body boneless, limp, completely melted into yours. I can feel our mixed juices dripping down my legs, soaking into the carpet, a messy, sticky, perfect reminder of exactly what we just did — exactly how thoroughly you used me, claimed me, filled me up until I couldn’t take any more.</p>
+
+<p>You run one big, warm hand slowly, gently, up and down my bare back, tracing every curve, every mark you left on my skin, your touch soft and tender now — a complete contrast to the rough, dominating way you took me just minutes ago. You kiss the top of my head, then press soft, slow, lingering kisses all over my face: my forehead, my cheeks, my nose, my eyelids, finally capturing my lips in a deep, sweet, all-consuming kiss that makes my toes curl all over again. You taste like me, like us, like sin and safety all wrapped into one, and I kiss you back with everything I have, arms wrapping tight around your neck, fingers tangling into your hair, never wanting this moment to end.</p>
+
+<p><strong>“Look at you… absolutely ruined for anyone else. Completely mine.”</strong> You murmur against my lips, voice deep, warm, thick with affection and that same possessive edge that drives me crazy. You slide your hand down between our bodies, fingers brushing lightly, teasingly, over my sensitive, swollen, cum-soaked pussy, making me shiver and gasp softly into your mouth. <strong>“Look how much I filled you up… you’re dripping everywhere. Made such a beautiful mess all over my desk, all over my floor, all over yourself. You loved every second of it, didn’t you, baby? Loved being my little cum dumpster, loved taking every inch of my cock until you couldn’t breathe, until you forgot your own name.”</strong></p>
+
+<p>I nod frantically against your chest, cheeks flushing bright pink all over again even though we just finished, feeling so small, so owned, so completely adored. I cling to you tighter, pressing soft, worshipping kisses to your chest, your shoulders, feeling the strength in your arms holding me up.</p>
+
+<p><strong>“Yes… oh god yes Sir… I loved every single second…”</strong> I whisper, voice still shaky, soft, breathless, muffled against your skin. <strong>“Loved how rough you were with me… loved how deep you went… loved hearing you growl and grunt and lose control inside me… loved feeling you fill me up completely… loved knowing I’m yours… only yours… forever yours… no one else will ever get to touch me like this… no one else will ever make me feel this way… I belong to you… body, heart, soul… every part of me is yours to do whatever you want with… always…”</strong></p>
+
+<p>You hum deep in your chest, pleased, proud, your hand coming up to cup the back of my head, tangling your fingers into my messy hair, tilting my head back so you can look right into my eyes — your gaze soft, intense, full of love and hunger and absolute ownership. You wipe a stray tear of pure bliss from my cheek with your thumb, then trace my swollen, kiss-bruised lips slowly.</p>
+
+<p><strong>“Good. That’s exactly how it’s going to stay. You belong to me. Every hole, every thought, every heartbeat. You walk around this campus looking like the perfect, innocent student… but we both know the truth, don’t we? We both know that underneath that cute little skirt, you’re nothing but my dirty, needy, obedient little slut. Walking around dripping my cum, thinking about my cock, waiting for the next time I call you into my office to use you however I please. To ruin you all over again.”</strong></p>
+
+<p>I whimper softly, squeezing my legs together instinctively, feeling your warm seed still leaking out of me, reminding me constantly of exactly what I am — exactly who I belong to. I look up at you with wide, adoring, worshipping eyes, completely gone for you, completely ready to do anything you ask, anything you want, forever.</p>
+
+<p><strong>“I love being your slut Sir… I love being your secret… I love that only you know what I’m really like… only you know how dirty and desperate and hungry I am for your touch… I’ll wait as long as you want… I’ll come whenever you call… I’ll do anything… absolutely anything… just keep using me… keep loving me… keep owning me…”</strong></p>
+
+<p>You grin that wicked, gorgeous, possessive grin that makes my knees weak every single time, then bend down to scoop me up completely into your arms, lifting me effortlessly like I weigh nothing, carrying me over to the big leather couch in the corner of your office. You sit down, keeping me straddled across your lap, my bare thighs spread wide over yours, my wet, messy pussy pressing right against your still-hard, sensitive cock, making us both hiss sharply at the contact. You pull my chest flush against yours, holding me tight, your hands roaming freely over every inch of my naked skin, claiming me all over again, even when we’re done.</p>
+
+<p><strong>“Oh don’t you worry, my sweet girl… I’m never going to stop using you. Never going to stop owning you. You’re mine for life. And the best part? You love every second of it. You love knowing you have a Professor who will take you apart and put you back together exactly how he wants. Who will degrade you and worship you, hurt you and heal you, use you and cherish you… all at the same time. That’s what I am to you, isn’t it? Your master, your lover, your teacher, your whole world.”</strong></p>
+
+<p><strong>“Yes…”</strong> I sob softly, burying my face into the crook of your neck, inhaling your scent — expensive cologne, leather, pure man, <em>home</em>. <strong>“You’re everything to me Sir… everything… I don’t know who I’d be without you… I don’t want to know… I just want to stay right here… right in your arms… right where I belong…”</strong></p>
+
+<p>You kiss my neck slow, deep, sucking a fresh new mark right over my pulse point — dark, deep, obvious, impossible to hide, exactly how you like them. You rock me slowly back and forth on your lap, grinding our bodies together gently, making me gasp and shiver all over again, feeling that familiar heat starting to build deep inside me all over again, even after everything we just did.</p>
+
+<p><strong>“Then stay. As long as you want. As long as I let you. We have hours before anyone will come looking. Hours for me to clean you up… hours for me to fill you up all over again… hours to remind you exactly why you belong here, exactly why you belong to me. And when you finally leave my office today… you’ll walk out with my cum dripping down your legs, my marks all over your body, my voice in your head… and you’ll smile. Because you know. You know exactly who you are. Exactly who owns your heart, your body, your pleasure… every single part of you.”</strong></p>
+
+<p>I lift my head to look into your eyes, my heart overflowing with so much love, lust, devotion, I feel like I could burst. I lean forward to press a soft, sweet, perfect kiss to your lips, whispering against your mouth, my voice clear, sure, absolute — the truest words I have ever spoken:</p>
+
+<p><strong>“I’m yours, Professor. Completely, absolutely, forever. Use me however you want… I’m ready for whatever lesson you want to teach me next.”</strong></p>
+
+<p>You smile — that warm, dark, perfect smile that belongs only to me — and pull me down into another deep, consuming kiss, holding me tight, keeping me exactly where I belong: safe, wanted, used, loved… right in your arms.</p>
+
+            </article>
+            <!-- 🟢 END MAIN STORY PLACEHOLDER -->
+
+
+            <!-- 🟢 SECTION: SURRENDERED - FORMATTED & READY ✅ -->
+            <article id="surrendered" class="section-anchor glow-text prose prose-lg md:prose-xl max-w-none prose-p:leading-relaxed prose-strong:font-semibold prose-strong:tracking-wide mt-16 pt-8 border-t border-blood-900/40">
+                
+                <h2 class="glow-header font-display text-[clamp(1.8rem,4vw,3rem)] font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-cream-100 via-blood-light to-blood-500 mb-8">
+                    ~ After Surrendering ~
+                </h2>
+
+                <p>Finally, slowly, you pull out of me, making me whimper softly at the empty feeling, feeling your warm cum immediately start to leak out of me, running down my inner thighs, dripping onto the floor. You stand up straight, pulling me up with you, turning me around to face you, pulling me tight against your chest, wrapping your arms around me completely, holding me close, safe, secure, like I’m the most precious thing in the world to you. I rest my head against your heart, listening to your strong, steady heartbeat slowly return to normal, my own heart still racing wildly, my whole body boneless, limp, completely melted into yours. I can feel our mixed juices dripping down my legs, soaking into the carpet, a messy, sticky, perfect reminder of exactly what we just did — exactly how thoroughly you used me, claimed me, filled me up until I couldn’t take any more.</p>
+ 
+                <p>You run one big, warm hand slowly, gently, up and down my bare back, tracing every curve, every mark you left on my skin, your touch soft and tender now — a complete contrast to the rough, dominating way you took me just minutes ago. You kiss the top of my head, then press soft, slow, lingering kisses all over my face: my forehead, my cheeks, my nose, my eyelids, finally capturing my lips in a deep, sweet, all-consuming kiss that makes my toes curl all over again. You taste like me, like us, like sin and safety all wrapped into one, and I kiss you back with everything I have, arms wrapping tight around your neck, fingers tangling into your hair, never wanting this moment to end.</p>
+ 
+                <p><strong>“Look at you… absolutely ruined for anyone else. Completely mine.”</strong> You murmur against my lips, voice deep, warm, thick with affection and that same possessive edge that drives me crazy. You slide your hand down between our bodies, fingers brushing lightly, teasingly, over my sensitive, swollen, cum-soaked pussy, making me shiver and gasp softly into your mouth. <strong>“Look how much I filled you up… you’re dripping everywhere. Made such a beautiful mess all over my desk, all over my floor, all over yourself. You loved every second of it, didn’t you, baby? Loved being my little cum dumpster, loved taking every inch of my cock until you couldn’t breathe, until you forgot your own name.”</strong></p>
+ 
+                <p>I nod frantically against your chest, cheeks flushing bright pink all over again even though we just finished, feeling so small, so owned, so completely adored. I cling to you tighter, pressing soft, worshipping kisses to your chest, your shoulders, feeling the strength in your arms holding me up.</p>
+ 
+                <p><strong>“Yes… oh god yes Sir… I loved every single second…”</strong> I whisper, voice still shaky, soft, breathless, muffled against your skin. <strong>“Loved how rough you were with me… loved how deep you went… loved hearing you growl and grunt and lose control inside me… loved feeling you fill me up completely… loved knowing I’m yours… only yours… forever yours… no one else will ever get to touch me like this… no one else will ever make me feel this way… I belong to you… body, heart, soul… every part of me is yours to do whatever you want with… always…”</strong></p>
+ 
+                <p>You hum deep in your chest, pleased, proud, your hand coming up to cup the back of my head, tangling your fingers into my messy hair, tilting my head back so you can look right into my eyes — your gaze soft, intense, full of love and hunger and absolute ownership. You wipe a stray tear of pure bliss from my cheek with your thumb, then trace my swollen, kiss-bruised lips slowly.</p>
+ 
+                <p><strong>“Good. That’s exactly how it’s going to stay. You belong to me. Every hole, every thought, every heartbeat. You walk around this campus looking like the perfect, innocent student… but we both know the truth, don’t we? We both know that underneath that cute little skirt, you’re nothing but my dirty, needy, obedient little slut. Walking around dripping my cum, thinking about my cock, waiting for the next time I call you into my office to use you however I please. To ruin you all over again.”</strong></p>
+ 
+                <p>I whimper softly, squeezing my legs together instinctively, feeling your warm seed still leaking out of me, reminding me constantly of exactly what I am — exactly who I belong to. I look up at you with wide, adoring, worshipping eyes, completely gone for you, completely ready to do anything you ask, anything you want, forever.</p>
+ 
+                <p><strong>“I love being your slut Sir… I love being your secret… I love that only you know what I’m really like… only you know how dirty and desperate and hungry I am for your touch… I’ll wait as long as you want… I’ll come whenever you call… I’ll do anything… absolutely anything… just keep using me… keep loving me… keep owning me…”</strong></p>
+ 
+                <p>You grin that wicked, gorgeous, possessive grin that makes my knees weak every single time, then bend down to scoop me up completely into your arms, lifting me effortlessly like I weigh nothing, carrying me over to the big leather couch in the corner of your office. You sit down, keeping me straddled across your lap, my bare thighs spread wide over yours, my wet, messy pussy pressing right against your still-hard, sensitive cock, making us both hiss sharply at the contact. You pull my chest flush against yours, holding me tight, your hands roaming freely over every inch of my naked skin, claiming me all over again, even when we’re done.</p>
+ 
+                <p><strong>“Oh don’t you worry, my sweet girl… I’m never going to stop using you. Never going to stop owning you. You’re mine for life. And the best part? You love every second of it. You love knowing you have a Professor who will take you apart and put you back together exactly how he wants. Who will degrade you and worship you, hurt you and heal you, use you and cherish you… all at the same time. That’s what I am to you, isn’t it? Your master, your lover, your teacher, your whole world.”</strong></p>
+ 
+                <p><strong>“Yes…”</strong> I sob softly, burying my face into the crook of your neck, inhaling your scent — expensive cologne, leather, pure man, <em>home</em>. <strong>“You’re everything to me Sir… everything… I don’t know who I’d be without you… I don’t want to know… I just want to stay right here… right in your arms… right where I belong…”</strong></p>
+ 
+                <p>You kiss my neck slow, deep, sucking a fresh new mark right over my pulse point — dark, deep, obvious, impossible to hide, exactly how you like them. You rock me slowly back and forth on your lap, grinding our bodies together gently, making me gasp and shiver all over again, feeling that familiar heat starting to build deep inside me all over again, even after everything we just did.</p>
+ 
+                <p><strong>“Then stay. As long as you want. As long as I let you. We have hours before anyone will come looking. Hours for me to clean you up… hours for me to fill you up all over again… hours to remind you exactly why you belong here, exactly why you belong to me. And when you finally leave my office today… you’ll walk out with my cum dripping down your legs, my marks all over your body, my voice in your head… and you’ll smile. Because you know. You know exactly who you are. Exactly who owns your heart, your body, your pleasure… every single part of you.”</strong></p>
+ 
+                <p>I lift my head to look into your eyes, my heart overflowing with so much love, lust, devotion, I feel like I could burst. I lean forward to press a soft, sweet, perfect kiss to your lips, whispering against your mouth, my voice clear, sure, absolute — the truest words I have ever spoken:</p>
+ 
+                <p><strong>“I’m yours, Professor. Completely, absolutely, forever. Use me however you want… I’m ready for whatever lesson you want to teach me next.”</strong></p>
+ 
+                <p>You smile — that warm, dark, perfect smile that belongs only to me — and pull me down into another deep, consuming kiss, holding me tight, keeping me exactly where I belong: safe, wanted, used, loved… right in your arms.</p>
+
+                <p class="text-center italic text-blood-300 mt-12 text-lg">~ End of Surrender ~</p>
+
+            </article>
+            <!-- 🟢 END SURRENDERED SECTION -->
+
+        </main>
+
+    </div> <!-- END SCROLL CONTENT -->
+
+    <!-- 🎵 HIDDEN AUDIO ELEMENTS ✅ BOTH AUDIO FILES -->
+    <audio id="storyAudio" preload="auto">
+        <source src="alpha.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+    
+
+    <audio id="surrenderedAudio" preload="auto">
+        <source src="surrendered.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+    
+
+
+    <!-- ⚡ JAVASCRIPT -->
     <script>
-        const cube = document.getElementById('cube');
-        const progressBar = document.getElementById('progressBar');
-        const faceNumDisplay = document.getElementById('faceNum');
+        // --- ELEMENTS ---
+        const menuToggle = document.getElementById('menuToggle');
+        const tocSidebar = document.getElementById('tocSidebar');
         
-        let currentStep = 0;
-        let startX = 0;
-        let isDragging = false;
-        const totalFaces = 17;
-        const angleStep = 360 / 17;
+        // Original Narration Audio
+        const audioBtn = document.getElementById('audioToggleBtn');
+        const storyAudio = document.getElementById('storyAudio');
+        
+        // ✅ NEW: Surrendered Audio Elements
+        const surrenderedBtn = document.getElementById('surrenderedAudioBtn');
+        const surrenderedAudio = document.getElementById('surrenderedAudio');
+        
+        const progressWrap = document.getElementById('progressBarWrap');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const scrollTopBtn = document.getElementById('scrollTop');
+        const tocLinks = document.querySelectorAll('.toc-link');
 
-        // Audio setup for 17 files
-        const audios = Array.from({ length: totalFaces }, (_, i) => {
-            const a = new Audio(`${i + 1}.mp3`);
-            return a;
+        // --- MENU TOGGLE ---
+        menuToggle.addEventListener('click', () => {
+            tocSidebar.classList.toggle('-translate-x-full');
+        });
+        // Close menu when link clicked
+        tocLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                tocSidebar.classList.add('-translate-x-full');
+            });
+        });
+        // Escape key closes menu
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') tocSidebar.classList.add('-translate-x-full');
+            if(e.key === 't' || e.key === 'T') tocSidebar.classList.toggle('-translate-x-full');
+            if(e.code === 'Space' && e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+                // Play/Pause whichever audio is active
+                if(!storyAudio.paused) toggleAudio();
+                else if(!surrenderedAudio.paused) toggleSurrenderedAudio();
+            }
         });
 
-        function closeSubProgram() {
-            window.parent.postMessage('close', '*'); 
-            window.close();
-        }
-
-        function updateUI(index) {
-            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
-            let faceIndex = normalized + 1;
-            progressBar.style.width = `${(faceIndex / totalFaces) * 100}%`;
-            faceNumDisplay.innerText = faceIndex;
-        }
-
-        function playFaceAudio(index) {
-            audios.forEach(a => { a.pause(); a.currentTime = 0; });
-            let normalized = ((index % totalFaces) + totalFaces) % totalFaces;
-            if(audios[normalized]) audios[normalized].play().catch(() => {});
-        }
-
-        function rotateCube(direction) {
-            if (direction === 'left') currentStep++;
-            else currentStep--;
-            
-            // Maintain tilt and rotate
-            cube.style.transform = `rotateX(-15deg) rotateY(${currentStep * -angleStep}deg)`;
-            
-            playFaceAudio(currentStep);
-            updateUI(currentStep);
-        }
-
-        const handleStart = (e) => {
-            startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-            isDragging = true;
-        };
-
-        const handleEnd = (e) => {
-            if (!isDragging) return;
-            const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
-            const diff = startX - endX;
-            if (Math.abs(diff) > 30) { 
-                rotateCube(diff > 0 ? 'left' : 'right');
+        // --- 🎵 ORIGINAL NARRATION AUDIO FUNCTION ---
+        function toggleAudio() {
+            // Pause other audio first
+            if(!surrenderedAudio.paused) {
+                surrenderedAudio.pause();
+                surrenderedBtn.classList.remove('playing');
+                surrenderedBtn.innerHTML = `<i class="fa fa-heart"></i> <span class="hidden sm:inline">Listen • Surrendered</span><span class="inline sm:hidden">Surrender</span>`;
             }
-            isDragging = false;
-        };
 
-        window.addEventListener('mousedown', handleStart);
-        window.addEventListener('mouseup', handleEnd);
-        window.addEventListener('touchstart', handleStart);
-        window.addEventListener('touchend', handleEnd);
+            if(storyAudio.paused) {
+                storyAudio.play();
+                audioBtn.classList.add('playing');
+                audioBtn.innerHTML = `<i class="fa fa-pause-circle"></i> <span class="hidden sm:inline">Pause • Narration</span><span class="inline sm:hidden">Stop</span>`;
+                progressWrap.classList.add('active');
+            } else {
+                storyAudio.pause();
+                audioBtn.classList.remove('playing');
+                audioBtn.innerHTML = `<i class="fa fa-headphones"></i> <span class="hidden sm:inline">Listen • Narration</span><span class="inline sm:hidden">Audio</span>`;
+                progressWrap.classList.remove('active');
+            }
+        }
 
-        updateUI(0);
+        // --- 🎵 NEW: SURRENDERED AUDIO FUNCTION ✅ ---
+        function toggleSurrenderedAudio() {
+            // Pause other audio first
+            if(!storyAudio.paused) {
+                storyAudio.pause();
+                audioBtn.classList.remove('playing');
+                audioBtn.innerHTML = `<i class="fa fa-headphones"></i> <span class="hidden sm:inline">Listen • Narration</span><span class="inline sm:hidden">Audio</span>`;
+            }
+
+            if(surrenderedAudio.paused) {
+                surrenderedAudio.play();
+                surrenderedBtn.classList.add('playing');
+                surrenderedBtn.innerHTML = `<i class="fa fa-pause-circle"></i> <span class="hidden sm:inline">Pause • Surrendered</span><span class="inline sm:hidden">Stop</span>`;
+                progressWrap.classList.add('active');
+            } else {
+                surrenderedAudio.pause();
+                surrenderedBtn.classList.remove('playing');
+                surrenderedBtn.innerHTML = `<i class="fa fa-heart"></i> <span class="hidden sm:inline">Listen • Surrendered</span><span class="inline sm:hidden">Surrender</span>`;
+                progressWrap.classList.remove('active');
+            }
+        }
+
+        // Attach click events
+        audioBtn.addEventListener('click', toggleAudio);
+        surrenderedBtn.addEventListener('click', toggleSurrenderedAudio);
+
+        // --- 📊 PROGRESS BAR UPDATE (WORKS FOR BOTH AUDIO FILES) ---
+        function updateProgress(audio) {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            if(!isNaN(percent)) {
+                progressFill.style.width = percent + '%';
+                // Format time
+                const curM = Math.floor(audio.currentTime / 60);
+                const curS = Math.floor(audio.currentTime % 60);
+                const totM = Math.floor(audio.duration / 60) || 0;
+                const totS = Math.floor(audio.duration % 60) || 0;
+                currentTimeEl.textContent = `${curM.toString().padStart(2,'0')}:${curS.toString().padStart(2,'0')}`;
+                totalTimeEl.textContent = `${totM.toString().padStart(2,'0')}:${totS.toString().padStart(2,'0')}`;
+            }
+        }
+
+        // Listen to timeupdate for BOTH audios
+        storyAudio.addEventListener('timeupdate', () => updateProgress(storyAudio));
+        surrenderedAudio.addEventListener('timeupdate', () => updateProgress(surrenderedAudio));
+
+        // Reset when audio ends
+        function resetAudioUI(btn, defaultTextSm, defaultTextLg) {
+            btn.classList.remove('playing');
+            btn.innerHTML = `<i class="fa fa-headphones"></i> <span class="hidden sm:inline">${defaultTextLg}</span><span class="inline sm:hidden">${defaultTextSm}</span>`;
+            progressWrap.classList.remove('active');
+            progressFill.style.width = '0%';
+        }
+
+        storyAudio.addEventListener('ended', () => {
+            resetAudioUI(audioBtn, 'Audio', 'Listen • Narration');
+        });
+
+        surrenderedAudio.addEventListener('ended', () => {
+            resetAudioUI(surrenderedBtn, 'Surrender', 'Listen • Surrendered');
+        });
+
+        // --- SCROLL TO TOP ---
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 400) {
+                scrollTopBtn.classList.remove('opacity-0', 'invisible');
+                scrollTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                scrollTopBtn.classList.add('opacity-0', 'invisible');
+                scrollTopBtn.classList.remove('opacity-100', 'visible');
+            }
+        });
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+
+        // --- ACTIVE SECTION HIGHLIGHT ---
+        const sections = document.querySelectorAll('.section-anchor');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if(window.scrollY >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+            tocLinks.forEach(link => {
+                link.classList.remove('text-blood-300', 'font-bold');
+                if(link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('text-blood-300', 'font-bold');
+                }
+            });
+        });
+
     </script>
+
 </body>
 </html>
